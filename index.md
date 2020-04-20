@@ -28,7 +28,7 @@ I hope you enjoy :D
 (As a disclaimer i would like to add that articles i present will use WebGL 2 for graphics, 
 if your device somehow doesn't support it, i would advise you to bend the examples to fit the needs of WebGL)
 
-1. [Setup - the html document](_1)
+1. [Setup - the html document](_1/)
 2. [Setup - WebGL 2 context initialization](_2.md)
 3. [WebGL 2 basics](_3.md)
 4. [WebXR Initialization](_4.md)
