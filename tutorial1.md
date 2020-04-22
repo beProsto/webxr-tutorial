@@ -154,5 +154,5 @@ After all this, your code should look like this:
 </html>
 ```
 
-Next: [Setup - WebGL 2 context initialization](_2.md)
-Previous: [Index](index.md)
+Next: [Setup - WebGL 2 context initialization](tutorial2)
+Previous: [Index](index)
