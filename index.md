@@ -30,13 +30,13 @@ if your device somehow doesn't support it, i would advise you to bend the exampl
 
 1. [Setup - the html document](tutorial1)
 2. [Setup - WebGL 2 context initialization](tutorial2)
-[//]: # 3. [WebGL 2 basics](tutorial3)
-[//]: # 4. [WebXR Initialization](tutorial4)
-[//]: # 5. [A simple 3D WebXR scene](tutorial5)
-[//]: # 6. [Finding the controllers](tutorial6)
-[//]: # 7. [Reading the controllers' input](tutorial7)
-[//]: # 8. [Fun - making the player move around with thumbsticks](tutorial8)
-[//]: # 9. [Fun - playing with 3D physics](tutorial9)
-[//]: # 10. [Fun - playing with guns](tutorial10)
-[//]: # 11. [Fun - cutting objects in halves with katanas](tutorial11)
-[//]: # 12. [Fun - creating a simple multiplayer game](tutorial12)
+[comment]: <3. [WebGL 2 basics](tutorial3)> 
+[//]: <4. [WebXR Initialization](tutorial4)> 
+[//]: <5. [A simple 3D WebXR scene](tutorial5)>
+[//]: <6. [Finding the controllers](tutorial6)>
+[//]: <7. [Reading the controllers' input](tutorial7)>
+[//]: <8. [Fun - making the player move around with thumbsticks](tutorial8)>
+[//]: <9. [Fun - playing with 3D physics](tutorial9)>
+[//]: <10. [Fun - playing with guns](tutorial10)>
+[//]: <11. [Fun - cutting objects in halves with katanas](tutorial11)>
+[//]: <12. [Fun - creating a simple multiplayer game](tutorial12)>
