@@ -1,6 +1,31 @@
 # Setup - the html document
 
-# In this article I'm going to cover a simple html document template for WebXR projects.
+# In this article I'm going to cover a simple html document template and tools needed for WebXR projects.
+
+For our project we're going to need a couple of simple tools:
+- Python - for running the server
+- A text editor - you can use any you want, I'll be going with VS Code.
+
+Now, for the project's setup:
+- Test if you have python by writing `python --version` in your terminal/console.
+- If you have installed python properly it should say `Python <version>`.
+- Now create a directory/folder in which you will keep all your project files.
+- Head over there and create a file named `index.html`.
+- Head over there using your terminal and type in `python -m http.server 8080`. 
+- It should've run a server on your PC on the port `8080`
+- To connect to your server, go to your web browser and connect to `http://localhost:8080/`.
+- Now, if you connect properly you should see a blank page. If it happens, congrats! Now you have a server!
+
+In the near future, I'll want to test our website out using my phone or oculus quest.
+To be able to connect to it using these devices, you'll have to do these things:
+- Find out your computer's IP address
+	- On windows, go to your console and type in `ipconfig`. You should see your IP in the `IPv4 Address` section.
+	- On debian, go to your terminal and type in `ifconfig`. You should see your IP in the `inet` section.
+	- On arch, go to your terminal and type in `ip address`. You should see your IP in the `inet` section.
+- Now run the server on this computer.
+- Go to your other device and make sure you're both connected to the same network.
+- Now go to the web browser on your other device, and type in `http://<IP>:8080/`.
+- If your other device connected succesfully, you're good to go!
 
 Our project, being a web project, needs an html document. 
 Fortunetly for us, WebXR doesn't require anything hard to do in our html document.
@@ -129,5 +154,5 @@ After all this, your code should look like this:
 </html>
 ```
 
-Next: [Setup - WebGL 2 context initialization](_2.md)
+Next: [Setup - WebGL 2 context initialization](_2.md) <br/>
 Previous: [Index](index.md)
