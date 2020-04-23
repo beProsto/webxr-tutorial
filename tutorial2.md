@@ -191,4 +191,4 @@ So now, you should see something like this:
 You can check out the project's files [here](https://github.com/beProsto/webxr-tutorial/tree/master/projects/tutorial2)!
 
 Next: <!-- [Setup - WebGL 2 context initialization](tutorial3) --> Coming in near future!
-Previous: [Index](index)
+Previous: [Setup - the html document](tutorial1)
