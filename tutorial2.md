@@ -186,9 +186,9 @@ initWebGL2(); // we call our init function, therefore initializing the applicati
 ```
 
 So now, you should see something like this:
-![screenshot](tutorial2_screenshot.png)
+![screenshot](data/tutorial2/tutorial2_screenshot.png)
 
-Ok, that would be all for now folks, have a neat day!
+You can check out the project's files [here](https://github.com/beProsto/webxr-tutorial)!
 
 Next: <!-- [Setup - WebGL 2 context initialization](tutorial3) --> Coming in near future!
 Previous: [Index](index)
