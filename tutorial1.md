@@ -153,7 +153,8 @@ After all this, your code should look like this:
 	</body>
 </html>
 ```
-You can check out the project's files [here](https://github.com/beProsto/webxr-tutorial)!
+
+You can check out the project's files [here](https://github.com/beProsto/webxr-tutorial/tree/master/projects/tutorial1)!
 
 Next: [Setup - WebGL 2 context initialization](tutorial2)
 Previous: [Index](index)
