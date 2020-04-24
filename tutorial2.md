@@ -194,6 +194,6 @@ Next: <!-- [Setup - WebGL 2 context initialization](tutorial3) --> Coming in nea
 Previous: [Setup - the html document](tutorial1)
 
 <hr/>
-<div w3-include-html="_includes/comments.html"></div>
+<div w3-include-html="includes/comments.html"></div>
 
-<script src="_includes/include.js"></script>
+<script src="./includes/include.js"></script>
