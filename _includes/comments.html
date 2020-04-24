@@ -1,5 +1,13 @@
 <!-- The comments are heavily based on aristath's implementation - here's his github: https://github.com/aristath -->
 
+<hr/>
+
+<div class="github-comments">
+	<h2>Comments</h2>
+	<p id="leave-a-comment">Join the discussion for this article on <a id="ticket">this ticket</a>.</p>
+	<ul id="gh-comments-list"></ul>
+</div>
+
 <script>
 let API_ID = 0;
 
@@ -65,11 +73,3 @@ function createCommentEl(response) {
 }
 request.send();
 </script>
-
-<hr/>
-
-<div class="github-comments">
-	<h2>Comments</h2>
-	<p id="leave-a-comment">Join the discussion for this article on <a id="ticket">this ticket</a>.</p>
-	<ul id="gh-comments-list"></ul>
-</div>
