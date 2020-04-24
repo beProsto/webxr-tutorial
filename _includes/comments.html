@@ -25,6 +25,8 @@ function createCommentEl(response) {
 	let user = document.createElement('a');
 	user.setAttribute('href', response.user.url.replace('api.github.com/users', 'github.com'));
 	user.classList.add('user');
+	let addr = user.href.split("/");
+	user.innerHTML = addr[addr.length - 1];
 
 	let commentLink = document.createElement('a');
 	commentLink.setAttribute('href', response.html_url);
