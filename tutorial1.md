@@ -158,3 +158,7 @@ You can check out the project's files [here](https://github.com/beProsto/webxr-t
 
 Next: [Setup - WebGL 2 context initialization](tutorial2)
 Previous: [Index](index)
+
+<div GITHUB_API_ID="1"></div>
+
+{% include comments.html %}
