@@ -1,7 +1,22 @@
 <!-- The comments are heavily based on aristath's implementation - here's his github: https://github.com/aristath -->
 
 <script>
-const GH_API_URL = 'https://api.github.com/repos/beProsto/webxr-tutorial/issues/1/comments';
+let API_ID = 0;
+
+(function () {
+	let z = document.getElementsByTagName("*");
+	for(i = 0; i < z.length; i++) {
+		const id = z[i].getAttribute("GITHUB_API_ID");
+		if(id) {
+			API_ID = id;
+
+			z[i].removeAttribute("GITHUB_API_ID");
+		}
+	}
+	document.getElementById('ticket').href = "https://github.com/beProsto/webxr-tutorial/issues/" + API_ID;
+})();
+
+const GH_API_URL = 'https://api.github.com/repos/beProsto/webxr-tutorial/issues/' + API_ID + '/comments';
 
 let request = new XMLHttpRequest();
 request.open('GET', GH_API_URL, true);
@@ -55,6 +70,6 @@ request.send();
 
 <div class="github-comments">
 	<h2>Comments</h2>
-	<p id="leave-a-comment">Join the discussion for this article on <a href="https://github.com/aristath/aristath.github.com/issues/5">this ticket</a>.</p>
+	<p id="leave-a-comment">Join the discussion for this article on <a id="ticket">this ticket</a>.</p>
 	<ul id="gh-comments-list"></ul>
 </div>
