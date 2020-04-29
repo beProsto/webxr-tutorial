@@ -30,7 +30,7 @@ if your device somehow doesn't support it, i would advise you to bend the exampl
 
 1. [Setup - the html document](tutorial1)
 2. [Setup - WebGL 2 context initialization](tutorial2)
-<!-- 3. [WebGL 2 basics](tutorial3) --> 
+<!-- 3. [WebGL 2 basics](tutorial3) -->
 <!-- 4. [WebXR Initialization](tutorial4) --> 
 <!-- 5. [A simple 3D WebXR scene](tutorial5) -->
 <!-- 6. [Finding the controllers](tutorial6) -->

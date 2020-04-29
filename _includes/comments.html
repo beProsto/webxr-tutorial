@@ -32,7 +32,7 @@ request.onload = function() {
 	if(this.status >= 200 && this.status < 400) {
 		let response = JSON.parse(this.response);
 
-		for(var i = 0; i < response.length; i++) {
+		for(let i = response.length; i > 0; --i) {
 			document.getElementById('gh-comments-list').appendChild(createCommentEl(response[i]));
 		}
 
