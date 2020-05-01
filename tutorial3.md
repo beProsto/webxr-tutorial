@@ -126,4 +126,4 @@ To make a quick summary:
 1. In WebGL, we draw on the screen using *triangles*.
 2. We specify our triangles using arrays of points.
 3. Our screen isn't represented using pixels, but the normalized coordinate system instead. ![Pixels vs Normalized](data/tutorial3/tutorial3_PixelVsNormalized.png)
-4. We specify our shapes using triangles, these triangles are made up of points. Let's see how to define a simple 2d point in normalized coordinate system. Let's say our point is on `x:-0.5`, `y:0.5`: ![Point](data/tutorial3/tutorial3_Point.png)
+4. We specify our shapes using triangles, these triangles are made up of points. Let's see how to define a simple 2d point in normalized coordinate system. <br/>Let's say our point is on `x: -0.5`, `y: 0.5`: ![Point](data/tutorial3/tutorial3_Point.png)
