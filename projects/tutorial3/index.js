@@ -22,17 +22,19 @@ function initWebGL2() {
 	gl.clearColor(1.0, 0.0, 0.0, 1.0); // specifies the clearing color to be read (using RGBA)
 	gl.clear(gl.COLOR_BUFFER_BIT); // clears the screen using a specified color
 	
+	// we declare this function inside of the init function to make passing variables between them easier
+	// yes js allows that
+	// yes it looks horrible
+	function onFrame() { // this function specifies what will happen every frame
+		// the only thing we want to happen for now, is for our screen to be cleared with a nice green color
+		gl.clearColor(0.3, 1.0, 0.4, 1.0); // specifies the clearing color to be read (using RGBA)
+		gl.clear(gl.COLOR_BUFFER_BIT); // clears the screen using a specified color
+
+		// we also have to tell our browser that we want this function to be called again in the next frame
+		window.requestAnimationFrame(onFrame); // we specify what function do we want to be called for the next frame
+	}	
 	// here we have to tell our browser what function we will call during the next frame
 	window.requestAnimationFrame(onFrame);
-}
-
-function onFrame() { // this function specifies what will happen every frame
-	// the only thing we want to happen for now, is for our screen to be cleared with a nice green color
-	gl.clearColor(0.3, 1.0, 0.4, 1.0); // specifies the clearing color to be read (using RGBA)
-	gl.clear(gl.COLOR_BUFFER_BIT); // clears the screen using a specified color
-
-	// we also have to tell our browser that we want this function to be called again in the next frame
-	window.requestAnimationFrame(onFrame); // we specify what function do we want to be called for the next frame
 }
 
 initWebGL2(); // we call our init function, therefore initializing the application
