@@ -123,9 +123,46 @@ The best part about it is that we will not have to modify it as much to actually
 What we have to do now is to learn a little bit of how modern OpenGL / GLES / WebGL2 works. Maybe you already know WebGL, but if you don't, [here's a tutorial series made by Indigo Code](https://www.youtube.com/watch?v=kB0ZVUrI4Aw&list=PLjcVFFANLS5zH_PeKC6I8p0Pt1hzph_rt).
 
 To make a quick summary:
-1. In WebGL, we draw on the screen using *triangles*.
+1. In WebGL, we draw using *triangles*.
 2. We specify our triangles using arrays of points.
 3. Our screen isn't represented using pixels, but the normalized coordinate system instead. ![Pixels vs Normalized](data/tutorial3/tutorial3_PixelVsNormalized.png)
 4. We specify our shapes using triangles, these triangles are made up of points. Let's see how to define a simple 2d point in normalized coordinate system. <br/>Let's say our point is on `x: -0.5`, `y: 0.5`: ![Point](data/tutorial3/tutorial3_Point.png)
 5. Now let's specify a simple triangle, using three 2d points: <br/>`x: -0.5`, `y: -0.5` <br/>`x: 0.0`, `y: 0.5` <br/>`x: 0.5`, `y: -0.5`: ![Points](data/tutorial3/tutorial3_TrianglePoints.png)
 6. If we connect these points and fill the space they take up with a nice color, like blue, we should get this: ![Triangle](data/tutorial3/tutorial3_TriangleFilled.png)
+7. If you want more advanced shapes, you just make them out of triangles, it's as simple as it really gets.
+8. Now I should say that OpenGL, or WebGL in this instance, isn't really 3d at it's base. You have to implement 3d yourself, using maths. In most cases, matrix maths. (Because GPUs are designed to be good and fast at multiplying matricies.)
+9. In WebGL, we create objects, after we create them we can destroy them, bind or unbind them. After we bind them, we can operate on them using functions. This is how it would look like if we wanted to create, a texture for instance:
+	- Create a texture
+	- Bind the texture
+	- Supply data to the texture
+	- Unbind the texture
+	- ...
+	- **When drawing something with that texture**
+	- Bind the texture
+	- Draw
+	- Unbind the texture
+	- ...
+	- **When we're done with our texture**
+	- Destroy the texture
+10. So now, that you know how WebGL operates, let's see how we can draw something using it.
+11. Get to know some simple object types you can create in WebGL2:
+	- Buffers - Are used to store data.
+		- Vertex Buffers - Store data about vertices (points), like vertex positions, vertex colors, vertex texture coordinates, vertex normals, anything at all.
+	- Vertex Arrays - Store data about vertex layout.
+		- They tell us how a vertex is being partitioned - how they are layed out. They can link to one or more vertex buffers, telling us which store which vertex data, or how do they do that. For instance, we can make a vertex buffer for vertex positions, and a vertex buffer for vertex colors and then link them using a vertex array. We will not use it this way however - to make life simpler for ourselves. Instead we're just gonna store our vertices as globs of data, in an array, which means that instead of doing seperate arrays (vertex buffers) for vertex positions and vertex colors, we're just gonna have them all in one. Believe me that it makes more than one thing easier.
+	- Shaders - They take in shader's code in form of a string, and the shader type in form of an enum.
+		- There's lots of shader types, we're gonna use just two:
+			- Vertex Shaders - They take in vertex data and do calculations on them, to return a simple 2d point in normalized coordinate space
+			- Fragment Shaders - (Pixel Shaders) They specify how every pixel that our shape takes up on the screen will look like (what color it will be).
+	- Programs - They combine shaders and let them work toghever.
+		- They make it possible for us to actually draw things, because they contain shaders telling our GPU how to position and color stuff.
+	- Textures - Are used to store data.
+		- Just like Buffers, Textures are used to store data, except textures are designed to store image data. They can be passed into Fragment Shaders, and used by these to color pixels of our shapes in corresponding colors of our texture.
+	- Frame Buffers - These are the things that you actually draw on.
+		- You have a main frame buffer, which is the one defaultly bound, and the one that simply represents your screen.
+		- You can bind additional frame buffers, which can draw to their textures.
+		- To get back to drawing to the main frame buffer, you just unbind the currently bound one.
+12. As you might see, we barely scratched the surface of what WebGL lets us do, and what are it's possibilities, but it's enough to get you going on this course - if you want to learn more, you're or on your own, or with [learnopengl](https://learnopengl.com/) (keep in mind that they are not in javascript, c++ instead, but they still are useful in providing information on OpenGL itself), or you might as well check out [MDN articles about WebGL/WebGL2](https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API).
+13. Let's get back to coding, shall we?
+
+So, now that you know basics of WebGL2, we should start coding a simple application. What I'd aim to achieve here would be a simple triangle, coloured blue.
