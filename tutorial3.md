@@ -162,7 +162,53 @@ To make a quick summary:
 		- You have a main frame buffer, which is the one defaultly bound, and the one that simply represents your screen.
 		- You can bind additional frame buffers, which can draw to their textures.
 		- To get back to drawing to the main frame buffer, you just unbind the currently bound one.
-12. As you might see, we barely scratched the surface of what WebGL lets us do, and what are it's possibilities, but it's enough to get you going on this course - if you want to learn more, you're or on your own, or with [learnopengl](https://learnopengl.com/) (keep in mind that they are not in javascript, c++ instead, but they still are useful in providing information on OpenGL itself), or you might as well check out [MDN articles about WebGL/WebGL2](https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API).
+12. As you might see, we barely scratched the surface of what WebGL lets us do, and what are it's possibilities, but it's enough to get you going on this course - if you want to learn more, you're or on your own, or with [learnopengl tutorials](https://learnopengl.com/) (keep in mind that they are not in javascript, c++ instead, but they still are useful in providing information on OpenGL itself), or you might as well check out [MDN articles about WebGL/WebGL2](https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API).
 13. Let's get back to coding, shall we?
 
 So, now that you know basics of WebGL2, we should start coding a simple application. What I'd aim to achieve here would be a simple triangle, coloured blue.
+Let's create a couple variables that will store our WebGL2 objects. Let's create a Vertex Buffer, Vertex Array, Vertex Shader, Fragment Shader and a Program.
+```js
+let vertexBuffer = null;
+let vertexArray = null;
+let vertexShader = null;
+let fragmentShader = null;
+let program = null;
+```
+
+Now let's set them all up, first, a simple vertex buffer. We will first define the vertex data:
+```js
+const vertexData = [ // a simple triangle in the middle of the screen
+	-0.5, -0.5, // every line simply defines a new 2d point
+	0.0, 0.5,
+	0.5, -0.5
+];
+```
+
+Now let's create, bind and supply with data our vertex buffer:
+```js
+vertexBuffer = gl.createBuffer(); // creates a new buffer
+gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer); // binds the vertex buffer as a vertex buffer
+// WebGL2 defines Vertex Buffer as Array Buffer, but it's literally the same thing
+gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexData), gl.STATIC_DRAW); // we tell opengl that we want to supply the currently bound vertex buffer (array buffer) with data, that's represented as a 32 bit float array, that will not be changed or modified oftenly (STATIC_DRAW says that)
+gl.bindBuffer(gl.ARRAY_BUFFER, null); // we unbind the currently bound vertex buffer (array buffer)
+```
+
+Let's create a simple Vertex Array:
+```js
+vertexArray = gl.createVertexArray(); // creates a new vertex array
+gl.bindVertexArray(vertexArray); // binds the new vertex array
+// Now we need to supply our vertex array with vertex layout data. For now it's simple, because it's just one 2d point per vertex, but once it gets more advanced you'll see why you need to understand what's going on here
+gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer); // we bind our vertex buffer, because it stores or will store the vertex data (in this example it already stores some, but it doesn't really matter, as long as you bound it in this step)
+gl.vertexAttribPointer(
+	0, // the location of our vertex layout element, in this case it will be zero, as it's the first one
+	2, // how much data this vertex layout element contains, in this case there are 2 floats per point, so that's what we say here
+	gl.FLOAT, // what type the data is, as i said, these are floats
+	false, // tells WebGL if it should normalize this data (modify it accordingly to the types limitations, to make it a float), when working with floats we don't have to do this, so we say false
+	2 * 4, // this specifies a stride, or a size in bytes of one vertex. In our case the full vertex only takes up two floats, so we say two times size (in bytes) of float, which is four.
+	0 // this is an offset, it tells us how far away (in bytes) this vertex layout element is from the start of the vertex
+);
+gl.enableVertexAttribArray(0); // we tell WebGL that we have the first vertex layout location allocated in this vertex array
+```
+
+This is how you can understand vertex strides and offsets in a simple form of an image:
+![Vertex Layout](data/tutorial3/tutorial3_VertexLayout.png)
