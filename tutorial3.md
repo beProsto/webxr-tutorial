@@ -1,4 +1,4 @@
-# WebGL 2 basics
+# WebGL 2 basics - A simple triangle
 
 ## Now we know how to setup our WebGL2 application, we're getting close to finally doing WebXR, but we're not there just yet!
 
@@ -439,7 +439,7 @@ Now this is what we should see on our website:
 
 You can check out the project's files [here](https://github.com/beProsto/webxr-tutorial/tree/master/projects/tutorial3)!
 
-Next: Coming Soon! 
+Next: [WebGL 2 basics - Shaders and vertices](tutorial4)
 Previous: [Setup - WebGL 2 context initialization](tutorial2)
 
 <div GITHUB_API_ID="3"></div>

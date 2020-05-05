@@ -26,12 +26,17 @@ and tell you how you can go on from there.
 I hope you enjoy :D
 
 (As a disclaimer i would like to add that articles i present will use WebGL 2 for graphics, 
-if your device somehow doesn't support it, i would advise you to bend the examples to fit the needs of WebGL)
+if your device somehow doesn't support it, i would advise you to bend the abstraction to fit the needs of WebGL)
+
+(If you don't feel like learning WebGL2, just jump ahead to tutorial number seven, copy it's project files, read the ending note on how to use the abstraction and you'll be all set.)
 
 1. [Setup - the html document](tutorial1)
 2. [Setup - WebGL 2 context initialization](tutorial2)
-3. [WebGL 2 basics](tutorial3)
-4. [WebGL 2 abstraction + OBJ Model loading](tutorial4)
+3. [WebGL 2 basics - A simple triangle](tutorial3)
+4. [WebGL 2 basics - Shaders and vertices](tutorial4)
+5. [WebGL 2 basics - Matrices and 3D](tutorial4)
+6. [WebGL 2 basics - Textures](tutorial4)
+7. [WebGL 2 basics - Abstraction](tutorial4)
 <!-- 5. [WebXR Initialization](tutorial5) --> 
 <!-- 6. [A simple 3D WebXR scene](tutorial6) -->
 <!-- 7. [Finding the controllers](tutorial7) -->

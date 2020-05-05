@@ -92,7 +92,7 @@ function initWebGL2() {
 	"in vec4 v_Color;" + // we have to take in our varying variable color
 
 	"void main() {" + // again, all the maths and operations go here
-		"o_Color = v_Color;" + // we simply set the fragment's color to be our varying color
+		"o_Color = v_Color * vec4(0.5, 0.5, 1.0, 1.0);" + // we set the fragment's color to be our varying color, but with half of it's red, half of it's green and it's full blue
 	"}";
 	// And keep in mind that the fragment shader runs per fragment (pixel)
 	

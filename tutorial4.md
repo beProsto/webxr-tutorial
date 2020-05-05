@@ -1,4 +1,4 @@
-# WebGL 2 abstraction + OBJ Model loading
+# WebGL 2 basics - Shaders and vertices
 
 ## In this tutorial we will abstract our WebGL2 code into classes such as Models and Materials, so that we will not have to look at WebGL2's code anymore.
 
@@ -90,3 +90,55 @@ const fragmentShaderCode = "#version 300 es\nprecision mediump float;\n" + // as
 
 Now if we run our website, we should see a triangle that looks like this:
 ![screenshot](data/tutorial4/tutorial4_screenshot1.png)
+
+Now we know that:
+1. We can pass more than one variable per vertex - we don't have to limit ourselves to only vertex positions, we can pass anything we want!
+2. When we pass a variable from the vertex shader to the fragment shader, it's value is going to be interpolated to fit how close the pixel is to which vertex.
+
+The second rule is presented in a very good manner by our example. As you can see, the colors interpolate between themselves, depending on how close they are to corresponding vertices.
+Now, as we know (or as we will learn), the values can be modified by us in any way we want. We can multiply colors, add them toghever, substract them, do anything we want. Let's go ahead and try doing it:
+```js
+const fragmentShaderCode = "#version 300 es\nprecision mediump float;\n" + // as i said, we have to put it into every shader we write
+"layout(location = 0) out vec4 o_Color;" + // as and output of the fragment shader we specify the fragment's (pixel's) color.
+
+"in vec4 v_Color;" + // we have to take in our varying variable color
+
+"void main() {" + // again, all the maths and operations go here
+	"o_Color = v_Color * vec4(1.0, 1.0, 0.0, 1.0);" + // we set the fragment's color to be our varying color multiplied by yellow
+"}";
+```
+
+Now, if we run our app, we should see something like this:
+![screenshot](data/tutorial4/tutorial4_screenshot2.png)
+
+As we can see, the part which was blue is now black, why is that? Well, it's because we multiplied red and green by one (which means we kept them), while multiplying blue by zero, which means that we basically got rid of blue. :D
+
+Now, let's see what happens if we try to darken our red and green, but keep the blue the same:
+```js
+const fragmentShaderCode = "#version 300 es\nprecision mediump float;\n" + // as i said, we have to put it into every shader we write
+"layout(location = 0) out vec4 o_Color;" + // as and output of the fragment shader we specify the fragment's (pixel's) color.
+
+"in vec4 v_Color;" + // we have to take in our varying variable color
+
+"void main() {" + // again, all the maths and operations go here
+	"o_Color = v_Color * vec4(0.5, 0.5, 1.0, 1.0);" + // we set the fragment's color to be our varying color, but with half of it's red, half of it's green and it's full blue
+"}";
+```
+
+Now, if we run our app, we should see something like this:
+![screenshot](data/tutorial4/tutorial4_screenshot3.png)
+
+What happened here? Exactly what we asked for - our reds and greens have been made darker, while blue was kept the same.
+
+I'd highly suggest you to play around with different operations - adding/substracting/dividing instead of multiplying, and with different values.
+In the next episode we're going to be talking about `uniforms`, which are values that you pass into your shaders per program instead of per vertex.
+
+
+You can check out the project's files [here](https://github.com/beProsto/webxr-tutorial/tree/master/projects/tutorial4)!
+
+Next: Coming soon!
+Previous: [Setup - the html document](tutorial1)
+
+<div GITHUB_API_ID="4"></div>
+
+{% include comments.html %}
