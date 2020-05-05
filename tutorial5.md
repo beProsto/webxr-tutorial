@@ -45,3 +45,6 @@ Oh, and if you haven't figured it out yet - it doesn't matter where you put this
 Now if we check on our website, we should see that our approach worked succesfully, and we only see red and the place of green and blue was taken up by black:
 ![screenshot](data/tutorial5/tutorial5_screenshot2.png)
 
+Just like when we did it the last time in the shader, here we also can play around with it, for instance set it to a more appealing combination of colors, for instance `0.5, 1.0, 0.5, 1.0`:
+![screenshot](data/tutorial5/tutorial5_screenshot3.png)
+

@@ -133,7 +133,7 @@ function initWebGL2() {
 	// Setting the color uniform
 	gl.useProgram(program); // we bind our program
 	const colorUniformLocation = gl.getUniformLocation(program, "u_Color"); // we get our uniform's location
-	gl.uniform4f(colorUniformLocation, 1.0, 0.0, 0.0, 1.0); // we set the color uniform to red
+	gl.uniform4f(colorUniformLocation, 0.5, 1.0, 0.5, 1.0); // we set the color uniform to red
 	gl.useProgram(null); // we unbind our program
 
 
