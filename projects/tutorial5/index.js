@@ -133,9 +133,7 @@ function initWebGL2() {
 	// Setting the color uniform
 	gl.useProgram(program); // we bind our program
 	const colorUniformLocation = gl.getUniformLocation(program, "u_Color"); // we get our uniform's location
-	gl.uniform4f(colorUniformLocation, 0.5, 1.0, 0.5, 1.0); // we set the color uniform to red
 	gl.useProgram(null); // we unbind our program
-
 
 	// we declare this function inside of the init function to make passing variables between them easier
 	// yes js allows that
@@ -149,6 +147,14 @@ function initWebGL2() {
 		gl.clear(gl.COLOR_BUFFER_BIT); // clears the screen using a specified color
 		
 		gl.useProgram(program); // we bind our program
+
+		gl.uniform4f(colorUniformLocation, 
+			Math.sin(Date.now() / 1000.0) / 2.0 + 0.5, 
+			Math.sin(Date.now() / 1000.0) / 2.0 + 0.5, 
+			Math.sin(Date.now() / 1000.0) / 2.0 + 0.5, 
+			1.0
+		); // we set the color uniform to a pulsating effect
+		
 		gl.bindVertexArray(vertexArray); // we bind our vertex array
 		gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer); // we bind out vertex buffer
 		

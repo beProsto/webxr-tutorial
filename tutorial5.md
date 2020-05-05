@@ -48,3 +48,36 @@ Now if we check on our website, we should see that our approach worked succesful
 Just like when we did it the last time in the shader, here we also can play around with it, for instance set it to a more appealing combination of colors, for instance `0.5, 1.0, 0.5, 1.0`:
 ![screenshot](data/tutorial5/tutorial5_screenshot3.png)
 
+We can even use the fact that it's easy and fast to apply them, and for instance set them every frame to create a pulstaing effect:
+```js
+
+	// Setting the color uniform
+	gl.useProgram(program); // we bind our program
+	const colorUniformLocation = gl.getUniformLocation(program, "u_Color"); // we get our uniform's location
+	gl.useProgram(null); // we unbind our program
+
+	// we declare this function inside of the init function to make passing variables between them easier
+	// yes js allows that
+	// yes it looks horrible
+	function onFrame() { // this function specifies what will happen every frame
+		// we have to set the viewport, so that our triangle will render to the whole window
+		gl.viewport(0, 0, canvas.width, canvas.height);
+		
+		// the only thing we want to happen for now, is for our screen to be cleared with a nice green color
+		gl.clearColor(0.3, 1.0, 0.4, 1.0); // specifies the clearing color to be read (using RGBA)
+		gl.clear(gl.COLOR_BUFFER_BIT); // clears the screen using a specified color
+		
+		gl.useProgram(program); // we bind our program
+
+		gl.uniform4f(colorUniformLocation, 
+			Math.sin(Date.now() / 1000.0) / 2.0 + 0.5, 
+			Math.sin(Date.now() / 1000.0) / 2.0 + 0.5, 
+			Math.sin(Date.now() / 1000.0) / 2.0 + 0.5, 
+			1.0
+		); // we set the color uniform to a pulsating effect
+```
+
+This is simply just a piece of our code. Just copy and paste the bits you lack, where you lack them, and see this beauty:
+![recording](data/tutorial5/tutorial5_recording.gif)
+
+(This recording is in GIF format, so it looks a little bit differently than how this effect really looks, but you can see that it pulsates.)
