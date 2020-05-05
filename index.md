@@ -32,11 +32,7 @@ if your device somehow doesn't support it, i would advise you to bend the abstra
 
 1. [Setup - the html document](tutorial1)
 2. [Setup - WebGL 2 context initialization](tutorial2)
-3. [WebGL 2 basics - A simple triangle](tutorial3)
-4. [WebGL 2 basics - Shaders and vertices](tutorial4)
-5. [WebGL 2 basics - Matrices and 3D](tutorial5)
-<!-- 6. [WebGL 2 basics - Textures](tutorial4) -->
-<!-- 7. [WebGL 2 basics - Abstraction](tutorial4) -->
+3. [A simple WebGL 2 abstraction](tutorial3)
 <!-- 5. [WebXR Initialization](tutorial5) --> 
 <!-- 6. [A simple 3D WebXR scene](tutorial6) -->
 <!-- 7. [Finding the controllers](tutorial7) -->

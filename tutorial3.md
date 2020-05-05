@@ -1,4 +1,4 @@
-# WebGL 2 basics - A simple triangle
+# A simple WebGL 2 abstraction
 
 ## Now we know how to setup our WebGL2 application, we're getting close to finally doing WebXR, but we're not there just yet!
 
@@ -120,176 +120,463 @@ I will have to say that it doesn't matter where you have `onFrame` specified in 
 
 The best part about it is that we will not have to modify it as much to actually get it to work in WebXR ecosystem. :D
 
-What we have to do now is to learn a little bit of how modern OpenGL / GLES / WebGL2 works. Maybe you already know WebGL, but if you don't, [here's a tutorial series made by Indigo Code](https://www.youtube.com/watch?v=kB0ZVUrI4Aw&list=PLjcVFFANLS5zH_PeKC6I8p0Pt1hzph_rt).
+What we have to do now is to learn a little bit about modern OpenGL / GLES / WebGL2, or just follow along this tutorial without knowing anything about them, and theach yourself about them later instead. Both are accurate approaches, in this article I'm writing a simple abstraction for WebGL2, so that even if you don't know WebGL2, you still can enjoy, and learn from these tutorials. Maybe you already know WebGL, but if you don't, and want to learn it, [here's a very good video tutorial series made by Indigo Code](https://www.youtube.com/watch?v=kB0ZVUrI4Aw&list=PLjcVFFANLS5zH_PeKC6I8p0Pt1hzph_rt).
 
-To make a quick summary:
-1. In WebGL, we draw using *triangles*.
-2. We specify our triangles using arrays of points.
-3. Our screen isn't represented using pixels, but the normalized coordinate system instead. ![Pixels vs Normalized](data/tutorial3/tutorial3_PixelVsNormalized.png)
-4. We specify our shapes using triangles, these triangles are made up of points. Let's see how to define a simple 2d point in normalized coordinate system. <br/>Let's say our point is on `x: -0.5`, `y: 0.5`: ![Point](data/tutorial3/tutorial3_Point.png)
-5. Now let's specify a simple triangle, using three 2d points: <br/>`x: -0.5`, `y: -0.5` <br/>`x: 0.0`, `y: 0.5` <br/>`x: 0.5`, `y: -0.5`: ![Points](data/tutorial3/tutorial3_TrianglePoints.png)
-6. If we connect these points and fill the space they take up with a nice color, like blue, we should get this: ![Triangle](data/tutorial3/tutorial3_TriangleFilled.png)
-7. If you want more advanced shapes, you just make them out of triangles, it's as simple as it really gets.
-8. Now I should say that OpenGL, or WebGL in this instance, isn't really 3d at it's base. You have to implement 3d yourself, using maths. In most cases, matrix maths. (Because GPUs are designed to be good and fast at multiplying matricies.)
-9. In WebGL, we create objects, after we create them we can destroy them, bind or unbind them. After we bind them, we can operate on them using functions. This is how it would look like if we wanted to create, a texture for instance:
-	- Create a texture
-	- Bind the texture
-	- Supply data to the texture
-	- Unbind the texture
-	- ...
-	- **When drawing something with that texture**
-	- Bind the texture
-	- Draw
-	- Unbind the texture
-	- ...
-	- **When we're done with our texture**
-	- Destroy the texture
-10. So now, that you know how WebGL operates, let's see how we can draw something using it.
-11. Get to know some simple object types you can create in WebGL2:
-	- Buffers - Are used to store data.
-		- Vertex Buffers - Store data about vertices (points), like vertex positions, vertex colors, vertex texture coordinates, vertex normals, anything at all.
-	- Vertex Arrays - Store data about vertex layout.
-		- They tell us how a vertex is being partitioned - how they are layed out. They can link to one or more vertex buffers, telling us which store which vertex data, or how do they do that. For instance, we can make a vertex buffer for vertex positions, and a vertex buffer for vertex colors and then link them using a vertex array. We will not use it this way however - to make life simpler for ourselves. Instead we're just gonna store our vertices as globs of data, in an array, which means that instead of doing seperate arrays (vertex buffers) for vertex positions and vertex colors, we're just gonna have them all in one. Believe me that it makes more than one thing easier.
-	- Shaders - They take in shader's code in form of a string, and the shader type in form of an enum.
-		- There's lots of shader types, we're gonna use just two:
-			- Vertex Shaders - They take in vertex data and do calculations on them, to return a simple 2d point in normalized coordinate space
-			- Fragment Shaders - (Pixel Shaders) They specify how every pixel that our shape takes up on the screen will look like (what color it will be).
-	- Programs - They combine shaders and let them work toghever.
-		- They make it possible for us to actually draw things, because they contain shaders telling our GPU how to position and color stuff.
-	- Textures - Are used to store data.
-		- Just like Buffers, Textures are used to store data, except textures are designed to store image data. They can be passed into Fragment Shaders, and used by these to color pixels of our shapes in corresponding colors of our texture.
-	- Frame Buffers - These are the things that you actually draw on.
-		- You have a main frame buffer, which is the one defaultly bound, and the one that simply represents your screen.
-		- You can bind additional frame buffers, which can draw to their textures.
-		- To get back to drawing to the main frame buffer, you just unbind the currently bound one.
-12. As you might see, we barely scratched the surface of what WebGL lets us do, and what are it's possibilities, but it's enough to get you going on this course - if you want to learn more, you're or on your own, or with [learnopengl tutorials](https://learnopengl.com/) (keep in mind that they are not in javascript, c++ instead, but they still are useful in providing information on OpenGL itself), or you might as well check out [MDN articles about WebGL/WebGL2](https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API).
-13. Let's get back to coding, shall we?
+I don't want to spend all the time in this tutorial talking about what WebGL2 lets us do, it would quickly turn into a very poor WebGL2 tutorial (believe me, i tried) - if you want to learn more, you're or on your own, or with [learnopengl tutorials](https://learnopengl.com/) (keep in mind that they are not in javascript, c++ instead, but they still are useful in providing information on OpenGL itself), or you might as well check out [MDN articles about WebGL/WebGL2](https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API).
 
-So, now that you know basics of WebGL2, we should start coding a simple application. What I'd aim to achieve here would be a simple triangle, coloured blue.
-Let's create a couple variables that will store our WebGL2 objects. Let's create a Vertex Buffer, Vertex Array, Vertex Shader, Fragment Shader and a Program.
+Now, with that out of the way, let's write a simple abstraction.
+First, let's create a file named `ezgl.js` (this will be where we'll store this whole abstraction).
+We'll fill it up with basic-ass WebGL2 abstraction for Vertex Buffers, Shaders, and textures:
 ```js
-let vertexBuffer = null;
-let vertexArray = null;
-let vertexShader = null;
-let fragmentShader = null;
-let program = null;
+let gl = null; // a global gl variable, we will assign our WebGL2 context to it
+const ezgl = { // inside of this object there will be all the basic abstraction
+	VertexBuffer: class { // both vertex buffer and vertex array, whereas the vertex array is here only to store the vertex layout
+		constructor() {
+			this.va = gl.createVertexArray();
+			gl.bindVertexArray(this.va);
+
+			this.vb = gl.createBuffer();
+			gl.bindBuffer(gl.ARRAY_BUFFER, this.vb);
+
+			this.stride = 0;
+			this.length = 0;
+			this.vertices = 0;
+			
+			gl.bindBuffer(gl.ARRAY_BUFFER, null);
+			gl.bindVertexArray(null);
+		}
+		free() { // free functions - they just delete all the WebGL2 objects created with the object
+			gl.deleteBuffer(this.vb);
+			gl.deleteVertexArray(this.va);
+		}
+
+		vertexLayout(layout = [3, 2, 3]) { // this function supplies the vertex layout - it says how many elements there are per vertex, and how much floats they take up. we will mostly use the [3, 2, 3] combination, because it's the one used by OBJ models
+			for(let i = 0; i < layout.length; i++) {
+				this.stride += layout[i] * 4;
+			}
+			
+			gl.bindVertexArray(this.va);
+			gl.bindBuffer(gl.ARRAY_BUFFER, this.vb);
+
+			let istride = 0;
+			for(let i = 0; i < layout.length; i++) {
+				gl.vertexAttribPointer(i, layout[i], gl.FLOAT, false, this.stride, istride);
+				gl.enableVertexAttribArray(i);
+
+				istride += layout[i] * 4;
+			}
+			
+			gl.bindBuffer(gl.ARRAY_BUFFER, null);
+			gl.bindVertexArray(null);
+
+			this.stride = this.stride / 4;
+			this.vertices = this.length / this.stride;
+		}
+		vertexData(data) { // simply takes in a Float32Array and supplies it to the buffer
+			this.length = data.length;
+			gl.bindVertexArray(this.va);
+			gl.bindBuffer(gl.ARRAY_BUFFER, this.vb);
+			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW);
+			gl.bindBuffer(gl.ARRAY_BUFFER, null);
+			gl.bindVertexArray(null);
+			this.vertices = this.length / this.stride;
+		}
+		draw() { // draws our mesh
+			gl.bindVertexArray(this.va);
+			gl.bindBuffer(gl.ARRAY_BUFFER, this.vb);
+
+			gl.drawArrays(gl.TRIANGLES, 0, this.vertices);
+
+			gl.bindBuffer(gl.ARRAY_BUFFER, null);
+			gl.bindVertexArray(null);
+		}
+		
+	},
+	SubShader: class { // known as shader in WebGL2, simply contains shader code and type
+		constructor(type, str) {
+			this.shader = gl.createShader(type);
+			gl.shaderSource(this.shader, str);
+			gl.compileShader(this.shader);
+		}
+		free() {
+			gl.deleteShader(this.shader);
+		}
+	},
+	Shader: class { // known as a program in WebGL2, just joins and links shaders
+		constructor() {
+			this.program = gl.createProgram();
+		}
+		free() {
+			gl.deleteProgram(this.program);
+		}
+
+		join(subshader) {
+			gl.attachShader(this.program, subshader.shader);
+			return this;
+		}
+		link() {
+			gl.linkProgram(this.program);
+			gl.useProgram(this.program);
+			gl.useProgram(null);
+			return this;
+		}
+
+		bind() {
+			gl.useProgram(this.program);
+			return this;
+		}
+		unbind() {
+			gl.useProgram(null);
+			return this;
+		}
+
+		// these are used for setting uniforms in shaders
+		set1i(name, val) { // mostly for texture IDs
+			gl.uniform1i(gl.getUniformLocation(this.program, name), val);
+			return this;
+		}
+		set1f(name, val) { // maybe will find some kind of a use
+			gl.uniform1f(gl.getUniformLocation(this.program, name), val);
+			return this;
+		}
+		set2f(name, x, y) { // maybe will find some kind of a use 
+			gl.uniform2f(gl.getUniformLocation(this.program, name), x, y);
+			return this;
+		}
+		set3f(name, x, y, z) { // maybe will find some kind of a use 
+			gl.uniform3f(gl.getUniformLocation(this.program, name), x, y, z);
+			return this;
+		}
+		set4f(name, x, y, z, w) { // maybe will find some kind of a use (most likely colors)
+			gl.uniform4f(gl.getUniformLocation(this.program, name), x, y, z, w);
+			return this;
+		}
+		set4x4f(name, mat) { // for matrices (projection, view, model)
+			gl.uniformMatrix4fv(gl.getUniformLocation(this.program, name), false, mat);
+			return this;
+		}
+	},
+	Texture: class { // Just a simple texture, and it can be loaded from a file
+		constructor() {
+			this.texture = gl.createTexture();
+			gl.bindTexture(gl.TEXTURE_2D, this.texture);
+			gl.bindTexture(gl.TEXTURE_2D, null);
+		}
+		free() {
+			gl.deleteTexture(this.texture);
+		}
+
+		fromFile(url, options = {wrap: gl.REPEAT, filter: gl.NEAREST}) {
+			gl.bindTexture(gl.TEXTURE_2D, this.texture);
+			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([255, 0, 255, 255]));
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, options.wrap);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, options.wrap);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, options.filter);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, options.filter);
+			let that = this;
+			const img = new Image();
+			img.onload = function() {
+				gl.bindTexture(gl.TEXTURE_2D, that.texture);
+				gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+			};
+			img.src = url;
+		}
+		fromData(data, options = {wrap: gl.REPEAT, filter: gl.NEAREST}) {
+			gl.bindTexture(gl.TEXTURE_2D, this.texture);
+			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(data));
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, options.wrap);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, options.wrap);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, options.filter);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, options.filter);
+		}
+
+		bind(slot = 0) {
+			gl.activeTexture(gl.TEXTURE0 + slot);
+			gl.bindTexture(gl.TEXTURE_2D, this.texture);
+		}
+	}
+};
 ```
 
-Now let's set them all up, first, a simple vertex buffer. We will first define the vertex data:
-```js
-const vertexData = [ // a simple triangle in the middle of the screen
-	-0.5, -0.5, // every line simply defines a new 2d point
-	0.0, 0.5,
-	0.5, -0.5
-];
+If you know WebGL2 - that code might've even made sense to you, if you don't - just copy and paste it, soon you will not have to look at WebGL2 code whatsoever.
+You should of course also load that script into your website - go to `index.html` and type:
+```html
+<script type="text/javascript" src="ezgl.js"></script>
 ```
 
-Now let's create, bind and supply with data our vertex buffer:
-```js
-vertexBuffer = gl.createBuffer(); // creates a new buffer
-gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer); // binds the vertex buffer as a vertex buffer
-// WebGL2 defines Vertex Buffer as Array Buffer, but it's literally the same thing
-gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexData), gl.STATIC_DRAW); // we tell opengl that we want to supply the currently bound vertex buffer (array buffer) with data, that's represented as a 32 bit float array, that will not be changed or modified oftenly (STATIC_DRAW says that)
-gl.bindBuffer(gl.ARRAY_BUFFER, null); // we unbind the currently bound vertex buffer (array buffer)
+Make sure to do it before `<script type="module" src="index.js"></script>`, so you'll end up with something like this:
+```html
+<script type="text/javascript" src="ezgl.js"></script>
+<script type="module" src="index.js"></script>
 ```
 
-Let's create a simple Vertex Array:
+Now, let's get to model loading. We want to load up simple 3D models from `*.obj` files. It's a pretty easy format to load from, just create a file named `ezobj.js` and code for it looks like this:
 ```js
-vertexArray = gl.createVertexArray(); // creates a new vertex array
-gl.bindVertexArray(vertexArray); // binds the new vertex array
-// Now we need to supply our vertex array with vertex layout data. For now it's simple, because it's just one 2d point per vertex, but once it gets more advanced you'll see why you need to understand what's going on here
-gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer); // we bind our vertex buffer, because it stores or will store the vertex data (in this example it already stores some, but it doesn't really matter, as long as you bound it in this step)
-// we set our vertex layout here
-// we only have one element in our vertices, so let's specify how it's presented to WebGL2
-gl.vertexAttribPointer(
-	0, // the location of our vertex layout element, in this case it will be zero, as it's the first one
-	2, // how much data this vertex layout element contains, in this case there are 2 floats per point, so that's what we say here
-	gl.FLOAT, // what type the data is, as i said, these are floats
-	false, // tells WebGL if it should normalize this data (modify it accordingly to the types limitations, to make it a float), when working with floats we don't have to do this, so we say false
-	2 * 4, // this specifies a stride, or a size in bytes of one vertex. In our case the full vertex only takes up two floats, so we say two times size (in bytes) of float, which is four.
-	0 // this is an offset, it tells us how far away (in bytes) this vertex layout element is from the start of the vertex
-);
-gl.enableVertexAttribArray(0); // we tell WebGL that we have the first vertex layout location allocated in this vertex array
-gl.bindBuffer(gl.ARRAY_BUFFER, null); // we unbind the currently bound vertex buffer
-gl.bindVertexArray(null); // unbinds the new vertex array
+const ezobj = {
+	insertXYZ: function(array, x, y, z) {
+		array.push(x);
+		array.push(y);
+		array.push(z);
+	},
+	insertUV: function(array, u, v) {
+		array.push(u);
+		array.push(v);
+	},
+	getX: function(array, index) {
+		return array[index * 3];
+	},
+	getY: function(array, index) {
+		return array[index * 3 + 1];
+	},
+	getZ: function(array, index) {
+		return array[index * 3 + 2];
+	},
+	getU: function(array, index) {
+		return array[index * 2];
+	},
+	getV: function(array, index) {
+		return array[index * 2 + 1];
+	},
+	getIndex: function(index) {
+		return parseInt(index) - 1;
+	},
+	insertVertex: function(dest, positions, texcoords, normals, vertstr) {
+		const indicesStr = vertstr.split("/");
+		const indexPos = ezobj.getIndex(indicesStr[0]);
+		const indexTex = ezobj.getIndex(indicesStr[1]);
+		const indexNor = ezobj.getIndex(indicesStr[2]);
+
+		dest.push(ezobj.getX(positions, indexPos));
+		dest.push(ezobj.getY(positions, indexPos));
+		dest.push(ezobj.getZ(positions, indexPos));
+
+		dest.push(ezobj.getU(texcoords, indexTex));
+		dest.push(ezobj.getV(texcoords, indexTex));
+		
+		dest.push(ezobj.getX(normals, indexNor));
+		dest.push(ezobj.getY(normals, indexNor));
+		dest.push(ezobj.getZ(normals, indexNor));
+	},
+	load: function(obj) {
+		let dest = [];
+		let positions = [];
+		let texcoords = [];
+		let normals = [];
+		
+		const lines = obj.split("\n");
+		for(let i = 0; i < lines.length; i++) {
+			const line = lines[i].split(" ");
+			
+			if(line[0] == "vt") {
+				ezobj.insertUV(texcoords, parseFloat(line[1]), parseFloat(line[2]));
+			}
+			else if(line[0] == "vn") {
+				ezobj.insertXYZ(normals, parseFloat(line[1]), parseFloat(line[2]), parseFloat(line[3]));
+			}
+			else if(line[0] == "v") {
+				ezobj.insertXYZ(positions, parseFloat(line[1]), parseFloat(line[2]), parseFloat(line[3]));
+			}
+			else if(line[0] == "f") {
+				ezobj.insertVertex(dest, positions, texcoords, normals, line[1]);
+				ezobj.insertVertex(dest, positions, texcoords, normals, line[2]);
+				ezobj.insertVertex(dest, positions, texcoords, normals, line[3]);
+			}
+		}
+		return dest;
+	},
+};
 ```
 
-This is how you can understand vertex layouts in a simple form of an image:
-![Vertex Layout](data/tutorial3/tutorial3_VertexLayout.png)
+The only function we'll need to care about will be the `load` function. It takes in our model as a string of already loaded text.
+Which means that later on, we'll have to load the file as text ourselves, and then pass that text into this function to get out a mesh.
 
-So now, if you understand how vertex data and vertex layouts work, let's create some shaders. We have to keep in mind, that shaders are programs on their own, so we have to write them in a programming language. GLSL to be exact. GLSL or `GL Shading Language` is a simple c-like programming language, designed to be used in shader programming. Let's write simple vertex and fragment shaders:
-```js
-const vertexShaderCode = "#version 300 es\nprecision mediump float;\n" + // These will have to appear in every shader we write, they set the version of GLSL that's used, and the floating point number's precision, in this case medium
-"layout(location = 0) in vec2 a_Position;" + // This takes in the first element of our vertex, in this case it's the only element, as you can see it's the vertex's position
-"void main() {" + // we specify our main function, here we will do all the maths and things
-	"gl_Position = vec4(a_Position, 0.0, 1.0);" + // the only thing we do in this shader, is that we set our point's position to be the vertex position we specified
-"}"; 
-// Also remember that the vertex shader runs per vertex
-
-const fragmentShaderCode = "#version 300 es\nprecision mediump float;\n" + // as i said, we have to put it into every shader we write
-"out vec4 o_Color;" + // as and output of the fragment shader we specify the fragment's (pixel's) color.
-"void main() {" + // again, all the maths and operations go here
-	"o_Color = vec4(0.3, 0.4, 1.0, 1.0);" + // we simply set the fragment's color to be some nice shade of blue
-"}";
-// And keep in mind that the fragment shader runs per fragment (pixel)
+Also, remember to import this script in you html code, just like the other ones:
+```html
+<script type="text/javascript" src="ezgl.js"></script>
+<script type="text/javascript" src="ezobj.js"></script>
+<script type="module" src="index.js"></script>
 ```
 
-So now, that we have wrote our shaders, let's compile them and link them into a program.
-```js
-vertexShader = gl.createShader(gl.VERTEX_SHADER); // we create a new vertex shader
-gl.shaderSource(vertexShader, vertexShaderCode); // we supply it with code
-gl.compileShader(vertexShader); // we compile it
-
-// simple error handling
-let message = gl.getShaderInfoLog(vertexShader);
-if(message.length > 0) {
-	console.error(message);
-	return;
-}
-
-fragmentShader = gl.createShader(gl.FRAGMENT_SHADER); // we create a new fragment shader
-gl.shaderSource(fragmentShader, fragmentShaderCode); // we supply it with code
-gl.compileShader(fragmentShader); // we compile it
-
-// simple error handling
-message = gl.getShaderInfoLog(fragmentShader);
-if(message.length > 0) {
-	console.error(message);
-	return;
-}
-
-program = gl.createProgram(); // we create our program
-gl.attachShader(program, vertexShader); // we attach our vertex shader to our program
-gl.attachShader(program, fragmentShader); // we attach our fragment shader to our program
-gl.linkProgram(program); // we link our program (glue it, make it stick toghever)
-gl.useProgram(program); // we bind our program
-gl.useProgram(null); // we unbind our program
-
-gl.deleteShader(vertexShader); // we delete our vertex shader, cuz we don't need it anymore
-gl.deleteShader(fragmentShader); // we delete our fragment shader, cuz we don't need it anymore
+And the last one we'll create will be named `ezgfx.js`, and yes - `ez` is my prefix for everything, i just like it. :D Again, import it:
+```html
+<script type="text/javascript" src="ezgl.js"></script>
+<script type="text/javascript" src="ezobj.js"></script>
+<script type="text/javascript" src="ezgfx.js"></script>
+<script type="module" src="index.js"></script>
 ```
 
-Now, we've got a Vertex Buffer, a Vertex Array, a Program - this should be all. Now everything that's left is to simply draw our thing:
+And now, let's write a simple abstraction for almost everything we need:
 ```js
-gl.useProgram(program); // we bind our program
-gl.bindVertexArray(vertexArray); // we bind our vertex array
-gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer); // we bind out vertex buffer
+let ezgfxGlobals = {}; // not for use by the user - it's just some global constants that are needed by our shaders 
+const ezgfx = {
+	Mesh: class {
+		constructor() {
+			this.vertexbuffer = new ezgl.VertexBuffer();
+			this.vertexbuffer.vertexLayout([3, 2, 3]);
+		}
+		free() {
+			this.vertexbuffer.free();
+		}
 
-gl.drawArrays(
-	gl.TRIANGLES, // drawing mode - as i said, we're gonna build our shapes from triangles, so that's what we draw with
-	0, // start - specifies the starting vertex from which we should start drawing our shape, we want to start from the beggining, so there's a zero there
-	3 // size - specifies the ammount of verticies we want to render, we want to render just one triangle, that's just three verticies, so here's a three
-);
+		loadFromData(data) {
+			this.vertexbuffer.vertexData(data);
+		}
+		loadFromOBJ(url) {
+			this.vertexbuffer.vertexData(ezgfxGlobals.triangle);
+			fetch(url).then(response => {
+				response.text().then(text => {
+					const verticesLoaded = ezobj.load(text);
+					this.vertexbuffer.vertexData(verticesLoaded);
+				});
+			});
+		}
+	},
+	Texture: class {
+		constructor() {
+			this.texture = new ezgl.Texture();
+		}
+		free() {
+			this.texture.free();
+		}
 
-gl.bindBuffer(gl.ARRAY_BUFFER, null); // we unbind our vertex buffer
-gl.bindVertexArray(null); // we unbing our vertex array
-gl.useProgram(null); // we unbind our program
+		loadFromFile(url, options = {wrap: gl.REPEAT, filter: gl.NEAREST}) {
+			this.texture.fromFile(url, options);
+		}
+		loadFromData(data, options = {wrap: gl.REPEAT, filter: gl.NEAREST}) {
+			this.texture.fromData(data, options);
+		}
+	},
+	Material: class {
+		constructor(customShader = null) {
+			this.shader = new ezgl.Shader();
+			this.shader.join(ezgfxGlobals.vSS);
+			if(!customShader) {
+				this.shader.join(ezgfxGlobals.fSS);
+				this.shader.link();
+			}
+			else {
+				let fSS = new ezgl.SubShader(gl.FRAGMENT_SHADER, ezgfxGlobals.fSSC0 + customShader + ezgfxGlobals.fSSC1); 
+				this.shader.join(fSS);
+				this.shader.link();
+				fSS.free();
+			}
+
+			this.shader.bind();
+			this.textures = [];
+			for(let i = 0; i < 16; i++) {
+				this.shader.set1i("u_TexID[" + i + "]", i);
+			}
+			this.shader.unbind();
+		}
+		free() {
+			this.shader.free();
+		}
+
+		setProjection(mat) {
+			this.shader.bind();
+			this.shader.set4x4f("u_Projection", mat);
+			this.shader.unbind();
+		}
+		setView(mat) {
+			this.shader.bind();
+			this.shader.set4x4f("u_View", mat);
+			this.shader.unbind();
+		}
+		setModel(mat) {
+			this.shader.bind();
+			this.shader.set4x4f("u_Model", mat);
+			this.shader.unbind();
+		}
+
+		setTexture(texture, slot = 0) {
+			this.textures[slot] = texture.texture;
+		}
+	},
+	Renderer: class {
+		constructor() {
+			this.color = [0.0, 0.0, 0.0, 1.0];
+			gl.clearColor(0.0, 0.0, 0.0, 1.0);
+			
+			this.masks = gl.COLOR_BUFFER_BIT;
+			this.depthTest = false;
+
+			ezgfxGlobals.fSSC0 = "#version 300 es\n\
+			precision mediump float;\n\
+			\n\
+			out vec4 o_Color;\n\
+			\n\
+			in vec2 v_TexCoord;\n\
+			\n\
+			uniform sampler2D u_TexID[16];\n";
+			ezgfxGlobals.fSSC1 = "\nvoid main() {\n\
+				o_Color = shader();\n\
+			}";
+			ezgfxGlobals.vSS = new ezgl.SubShader(gl.VERTEX_SHADER, "#version 300 es\n\
+			precision mediump float;\n\
+			\n\
+			layout(location = 0) in vec3 a_Position;\n\
+			layout(location = 1) in vec2 a_TexCoord;\n\
+			layout(location = 2) in vec3 a_Normal;\n\
+			\n\
+			uniform mat4 u_Projection;\n\
+			uniform mat4 u_View;\n\
+			uniform mat4 u_Model;\n\
+			\n\
+			out vec2 v_TexCoord;\n\
+			\n\
+			void main() {\n\
+			gl_Position = u_Projection * u_View * u_Model * vec4(a_Position, 1.0);\n\
+				v_TexCoord = a_TexCoord;\n\
+				v_TexCoord.y = 1.0 - v_TexCoord.y;\n\
+			}");
+			ezgfxGlobals.fSS = new ezgl.SubShader(gl.FRAGMENT_SHADER, ezgfxGlobals.fSSC0 + "\nvec4 shader() { return vec4(1.0); }\n" + ezgfxGlobals.fSSC1),
+				
+			ezgfxGlobals.triangle = [
+					-0.5, -0.5, 0.0,
+						0.0, 0.0,
+							0.0, 0.0, 1.0,
+					0.0, 0.5, 0.0,
+						0.5, 1.0,
+							0.0, 0.0, 1.0,
+					0.5, -0.5, 0.0,
+						1.0, 0.0,
+							0.0, 0.0, 1.0 
+			];
+		}
+		depthTesting(enable) {
+			if(enable && !this.depthTest) {
+				this.masks = gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT;
+				gl.enable(gl.DEPTH_TEST);
+			}
+			else if(!enable && this.depthTest) {
+				this.masks = gl.COLOR_BUFFER_BIT;
+				gl.disable(gl.DEPTH_TEST);
+			}
+		}
+		clear(color = [0.0, 0.0, 0.0, 1.0]) {
+			if(color != this.color) {
+				gl.clearColor(color[0], color[1], color[2], color[3]);
+				this.color = color;
+			}
+			gl.clear(this.masks);
+		}
+		draw(mesh, material) {
+			material.shader.bind();
+			for(let i = 0; i < material.textures.size; i++) {
+				material.textures[i].bind(i);
+			}
+			mesh.vertexbuffer.draw();
+			material.shader.unbind();
+		}
+	}
+};
 ```
 
-Now, let's assemble it, and see how our code looks at it's final stage:
+With this type of abstraction we basically don't need to write almost any WebGL2 code.
+All we have to do, is to create a new `ezgfx` Renderer, create a mesh and a material, and we're all set!
+Actually, let's write a simple test for this:
 ```js
 let canvas = null; // we'll keep it as a global object
-let gl = null; // it will store our context, and all the functions and constants that are needed to use it
 
 function onResize() { // this function resizes our canvas in a way, that makes it fit the entire screen perfectly!
 	canvas.width = canvas.clientWidth * window.devicePixelRatio;
@@ -309,115 +596,33 @@ function initWebGL2() {
 	document.body.appendChild(canvas); // appends/adds the canvas element to the document's body
 	onResize(); // resizes the canvas (it needs to be done, because otherwise it will not resize until you resize your window)
 	
-	gl.clearColor(1.0, 0.0, 0.0, 1.0); // specifies the clearing color to be read (using RGBA)
-	gl.clear(gl.COLOR_BUFFER_BIT); // clears the screen using a specified color
-	
-	let vertexBuffer = null;
-	let vertexArray = null;
-	let vertexShader = null;
-	let fragmentShader = null;
-	let program = null;
-	
-	const vertexData = [ // a simple triangle in the middle of the screen
-		-0.5, -0.5, // every line simply defines a new 2d point
-		0.0, 0.5,
-		0.5, -0.5
-	];
+	const renderer = new ezgfx.Renderer(); // creates a new ezgfx Renderer
+	renderer.clear([0.3, 1.0, 0.4, 1.0]); // clears the screen to be nice and green
 
-	vertexBuffer = gl.createBuffer(); // creates a new buffer
-	gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer); // binds the vertex buffer as a vertex buffer
-	// WebGL2 defines Vertex Buffer as Array Buffer, but it's literally the same thing
-	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexData), gl.STATIC_DRAW); // we tell opengl that we want to supply the currently bound vertex buffer (array buffer) with data, that's represented as a 32 bit float array, that will not be changed or modified oftenly (STATIC_DRAW says that)
-	gl.bindBuffer(gl.ARRAY_BUFFER, null); // we unbind the currently bound vertex buffer (array buffer)
-	
-	vertexArray = gl.createVertexArray(); // creates a new vertex array
-	gl.bindVertexArray(vertexArray); // binds the new vertex array
-	// Now we need to supply our vertex array with vertex layout data. For now it's simple, because it's just one 2d point per vertex, but once it gets more advanced you'll see why you need to understand what's going on here
-	gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer); // we bind our vertex buffer, because it stores or will store the vertex data (in this example it already stores some, but it doesn't really matter, as long as you bound it in this step)
-	// we set our vertex layout here
-	// we only have one element in our vertices, so let's specify how it's presented to WebGL2
-	gl.vertexAttribPointer(
-		0, // the location of our vertex layout element, in this case it will be zero, as it's the first one
-		2, // how much data this vertex layout element contains, in this case there are 2 floats per point, so that's what we say here
-		gl.FLOAT, // what type the data is, as i said, these are floats
-		false, // tells WebGL if it should normalize this data (modify it accordingly to the types limitations, to make it a float), when working with floats we don't have to do this, so we say false
-		2 * 4, // this specifies a stride, or a size in bytes of one vertex. In our case the full vertex only takes up two floats, so we say two times size (in bytes) of float, which is four.
-		0 // this is an offset, it tells us how far away (in bytes) this vertex layout element is from the start of the vertex
-	);
-	gl.enableVertexAttribArray(0); // we tell WebGL that we have the first vertex layout location allocated in this vertex array
-	gl.bindBuffer(gl.ARRAY_BUFFER, null); // we unbind the currently bound vertex buffer
-	gl.bindVertexArray(null); // unbinds the new vertex array
-	
-	const vertexShaderCode = "#version 300 es\nprecision mediump float;\n" + // These will have to appear in every shader we write, they set the version of GLSL that's used, and the floating point number's precision, in this case medium
-	"layout(location = 0) in vec2 a_Position;" + // This takes in the first element of our vertex, in this case it's the only element, as you can see it's the vertex's position
-	"void main() {" + // we specify our main function, here we will do all the maths and things
-		"gl_Position = vec4(a_Position, 0.0, 1.0);" + // the only thing we do in this shader, is that we set our point's position to be the vertex position we specified
-	"}"; 
-	// Also remember that the vertex shader runs per vertex
+	const mesh = new ezgfx.Mesh(); // we create a new mesh
+	mesh.loadFromData(ezgfxGlobals.triangle); // we make our mesh to be a simple triangle
 
-	const fragmentShaderCode = "#version 300 es\nprecision mediump float;\n" + // as i said, we have to put it into every shader we write
-	"layout(location = 0) out vec4 o_Color;" + // as and output of the fragment shader we specify the fragment's (pixel's) color.
-	"void main() {" + // again, all the maths and operations go here
-		"o_Color = vec4(0.3, 0.4, 1.0, 1.0);" + // we simply set the fragment's color to be some nice shade of blue
-	"}";
-	// And keep in mind that the fragment shader runs per fragment (pixel)
-	
-	vertexShader = gl.createShader(gl.VERTEX_SHADER); // we create a new vertex shader
-	gl.shaderSource(vertexShader, vertexShaderCode); // we supply it with code
-	gl.compileShader(vertexShader); // we compile it
-	
-	// simple error handling
-	let message = gl.getShaderInfoLog(vertexShader);
-	if(message.length > 0) {
-		console.error(message);
-		return;
-	}
-
-	fragmentShader = gl.createShader(gl.FRAGMENT_SHADER); // we create a new fragment shader
-	gl.shaderSource(fragmentShader, fragmentShaderCode); // we supply it with code
-	gl.compileShader(fragmentShader); // we compile it
-	
-	// simple error handling
-	message = gl.getShaderInfoLog(fragmentShader);
-	if(message.length > 0) {
-		console.error(message);
-		return;
-	}
-
-	program = gl.createProgram(); // we create our program
-	gl.attachShader(program, vertexShader); // we attach our vertex shader to our program
-	gl.attachShader(program, fragmentShader); // we attach our fragment shader to our program
-	gl.linkProgram(program); // we link our program (glue it, make it stick toghever)
-	gl.useProgram(program); // we bind our program
-	gl.useProgram(null); // we unbind our program
-	
-	//gl.deleteShader(vertexShader); // we delete our vertex shader, cuz we don't need it anymore
-	//gl.deleteShader(fragmentShader); // we delete our fragment shader, cuz we don't need it anymore
+	const material = new ezgfx.Material(); // we create a material
+	// We're setting all our matrices to identity (i'll talk about it in a minute)
+	const identityMatrix = new Float32Array([
+		1.0, 0.0, 0.0, 0.0,
+		0.0, 1.0, 0.0, 0.0,
+		0.0, 0.0, 1.0, 0.0,
+		0.0, 0.0, 0.0, 1.0
+	]);
+	material.setProjection(identityMatrix);
+	material.setView(identityMatrix);
+	material.setModel(identityMatrix);
 
 	// we declare this function inside of the init function to make passing variables between them easier
-	// yes js allows that
-	// yes it looks horrible
 	function onFrame() { // this function specifies what will happen every frame
-		// the only thing we want to happen for now, is for our screen to be cleared with a nice green color
-		gl.clearColor(0.3, 1.0, 0.4, 1.0); // specifies the clearing color to be read (using RGBA)
-		gl.clear(gl.COLOR_BUFFER_BIT); // clears the screen using a specified color
-		
-		gl.useProgram(program); // we bind our program
-		gl.bindVertexArray(vertexArray); // we bind our vertex array
-		gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer); // we bind out vertex buffer
-		
-		gl.drawArrays(
-			gl.TRIANGLES, // drawing mode - as i said, we're gonna build our shapes from triangles, so that's what we draw with
-			0, // start - specifies the starting vertex from which we should start drawing our shape, we want to start from the beggining, so there's a zero there
-			3 // size - specifies the ammount of verticies we want to render, we want to render just one triangle, that's just three verticies, so here's a three
-		);
-		
-		gl.bindBuffer(gl.ARRAY_BUFFER, null); // we unbind our vertex buffer
-		gl.bindVertexArray(null); // we unbing our vertex array
-		gl.useProgram(null); // we unbind our program
-		
+		gl.viewport(0, 0, canvas.width, canvas.height); // resizes the webgl2's virtual viewport to fit the entire screen
+		renderer.clear([0.3, 1.0, 0.4, 1.0]); // clears the screen with the specified green color (RGBA)
+
+		renderer.draw(mesh, material); // draws our triangle combined with the material of our choice
+
 		// we also have to tell our browser that we want this function to be called again in the next frame
-		window.requestAnimationFrame(onFrame); // we specify what function do we want to be called for the next frame
+		window.requestAnimationFrame(onFrame);
 	}	
 	// here we have to tell our browser what function we will call during the next frame
 	window.requestAnimationFrame(onFrame);
@@ -426,16 +631,8 @@ function initWebGL2() {
 initWebGL2(); // we call our init function, therefore initializing the application
 ```
 
-If we check on our website now, we should be able to see a nice little triangle in the left bottom corner, "but why in the corner?" you might ask. 
-The answer is pretty simple. Our canvas is set to be the size of the whole screen, but our viewport isn't. Viewport is a WebGL functionality, that let's us specify the area that we want to draw on, in pixels.
-So the only thing we have to do, is to add a viewport setter at the start of our `onFrame` function:
-```js
-// we have to set the viewport, so that our triangle will render to the whole window
-gl.viewport(0, 0, canvas.width, canvas.height);
-```
-
-Now this is what we should see on our website:
-![screenshot2](data/tutorial3/tutorial3_screenshot2.png)
+And now you should see a nice, big, white triangle in the middle of your screen:
+![screenshot](data/tutorial3/tutorial3_screenshot2.png)
 
 You can check out the project's files [here](https://github.com/beProsto/webxr-tutorial/tree/master/projects/tutorial3)!
 
