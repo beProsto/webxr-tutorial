@@ -2,9 +2,7 @@
 
 ## In this tutorial we will abstract our WebGL2 code into classes such as Models and Materials, so that we will not have to look at WebGL2's code anymore.
 
-You might ask - "but why?". Well, the answer lies in *you*. Yes, you, the reader. As I said (or didn't say), I don't expect everyone to know WebGL2, nor understand it from my clunky explanation. Therefore, we're going to make it a little bit easier to use WebGL2 - using abstraction. Instead of writing shaders, we will simply define a material, instead of creating vertex buffers and vertex arrays, we're just gonna create a model. Simple as that. If you didn't understand my explanation of WebGL2 - you are welcome to enjoy this tutorial, or just go ahead and read the summary of the code written, copy it and paste into your project. I assure you, we will not use almost any WebGL2 concept later on in the tutorial series - we're gonna concentrate on WebXR and the possibilities it provides.
-
-But first - let's get a little comfy with GLSL and vertex layouts. In previous episode we defined a vertex layout that only lets us define positions of vertices, which we used in our vertex shaders to position the vertices on the screen. But what if we want our vertices to contain more, than just information about their position? Let's say we want to assign a special color to every single one of our vertices.
+Let's get a little comfy with GLSL and vertex layouts. In previous episode we defined a vertex layout that only lets us define positions of vertices, which we used in our vertex shaders to position the vertices on the screen. But what if we want our vertices to contain more, than just information about their position? Let's say we want to assign a special color to every single one of our vertices.
 ```js
 const vertexData = [ // a simple triangle in the middle of the screen, with different colors per every vertex
 	-0.5, -0.5, // position 0

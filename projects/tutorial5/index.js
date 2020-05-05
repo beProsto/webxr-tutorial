@@ -91,8 +91,10 @@ function initWebGL2() {
 
 	"in vec4 v_Color;" + // we have to take in our varying variable color
 
+	"uniform vec4 u_Color;" + // we specify that we want to take in an uniform variable named u_Color
+
 	"void main() {" + // again, all the maths and operations go here
-		"o_Color = v_Color * vec4(0.5, 0.5, 1.0, 1.0);" + // we set the fragment's color to be our varying color, but with half of it's red, half of it's green and it's full blue
+		"o_Color = v_Color * u_Color;" + // we set the fragment's color to be our varying color, but multiplied by our uniform color
 	"}";
 	// And keep in mind that the fragment shader runs per fragment (pixel)
 	
@@ -127,6 +129,13 @@ function initWebGL2() {
 	
 	//gl.deleteShader(vertexShader); // we delete our vertex shader, cuz we don't need it anymore
 	//gl.deleteShader(fragmentShader); // we delete our fragment shader, cuz we don't need it anymore
+
+	// Setting the color uniform
+	gl.useProgram(program); // we bind our program
+	const colorUniformLocation = gl.getUniformLocation(program, "u_Color"); // we get our uniform's location
+	gl.uniform4f(colorUniformLocation, 1.0, 0.0, 0.0, 1.0); // we set the color uniform to red
+	gl.useProgram(null); // we unbind our program
+
 
 	// we declare this function inside of the init function to make passing variables between them easier
 	// yes js allows that
