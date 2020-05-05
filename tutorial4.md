@@ -136,8 +136,8 @@ In the next episode we're going to be talking about `uniforms`, which are values
 
 You can check out the project's files [here](https://github.com/beProsto/webxr-tutorial/tree/master/projects/tutorial4)!
 
-Next: Coming soon!
-Previous: [Setup - the html document](tutorial1)
+Next: [WebGL 2 basics - Matrices and 3D](tutorial5)
+Previous: [WebGL 2 basics - A simple triangle](tutorial3)
 
 <div GITHUB_API_ID="4"></div>
 
