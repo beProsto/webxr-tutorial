@@ -636,7 +636,7 @@ And now you should see a nice, big, white triangle in the middle of your screen:
 
 You can check out the project's files [here](https://github.com/beProsto/webxr-tutorial/tree/master/projects/tutorial3)!
 
-Next: [WebGL 2 basics - Shaders and vertices](tutorial4)
+Next: Coming Soon!
 Previous: [Setup - WebGL 2 context initialization](tutorial2)
 
 <div GITHUB_API_ID="3"></div>
