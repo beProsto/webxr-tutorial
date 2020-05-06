@@ -634,6 +634,8 @@ initWebGL2(); // we call our init function, therefore initializing the applicati
 And now you should see a nice, big, white triangle in the middle of your screen:
 ![screenshot](data/tutorial3/tutorial3_screenshot2.png)
 
+And as I said already - if you don't feel like learning WebGL now, you can still follow along this tutorial series because of this exact abstraction thing we did today. :D
+
 You can check out the project's files [here](https://github.com/beProsto/webxr-tutorial/tree/master/projects/tutorial3)!
 
 Next: Coming Soon!
