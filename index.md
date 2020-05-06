@@ -28,7 +28,7 @@ I hope you enjoy :D
 (As a disclaimer i would like to add that articles i present will use WebGL 2 for graphics, 
 if your device somehow doesn't support it, i would advise you to bend the abstraction to fit the needs of WebGL)
 
-(If you don't feel like learning WebGL2, just jump ahead to tutorial number seven, copy it's project files, read the ending note on how to use the abstraction and you'll be all set.)
+(If you don't feel like learning WebGL2, just jump ahead to tutorial number three, copy it's project files, read the example of how to use the abstraction and you'll be all set.)
 
 1. [Setup - the html document](tutorial1)
 2. [Setup - WebGL 2 context initialization](tutorial2)
