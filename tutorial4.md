@@ -19,9 +19,11 @@ final = Matrix4.Translate(1.0, 0.0, 0.0) * Matrix4.RotateZ(90.0) * Vector3(1.0, 
 ```
 
 Will result in our point being first rotated 90 degrees around the Z axis, which would position from `x:1.0,y:0.0,z:0.0` to `x:0.0,y:-1.0,z:0.0`:
+
 ![rotation](data/tutorial4/tutorial4_rotation.png)
 
 And after that, our resulting point will be translated by *one* in the x axis, which would make it go from `x:0.0,y:-1.0,z:0.0` to `x:1.0,y:-1.0,z:0.0`:
+
 ![translation](data/tutorial4/tutorial4_translation.png)
 
 Which means that we would in total go from `x:1.0,y:0.0,z:0.0` to `x:1.0,y:-1.0,z:0.0`. We could also pre-multiply the matrices toghever, this has a couple of pros: 
