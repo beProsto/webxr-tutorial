@@ -18,7 +18,7 @@ Which means that this:
 final = Matrix4.Translate(1.0, 0.0, 0.0) * Matrix4.RotateZ(90.0) * Vector3(1.0, 0.0, 0.0)
 ```
 
-Will result in our point being first rotated 90 degrees around the Z axis, which would position from `x:1.0,y:0.0,z:0.0` to `x:0.0,y:-1.0,z:0.0`:
+Will result in our point being first rotated 90 degrees around the Z axis, which would change it's position from `x:1.0,y:0.0,z:0.0` to `x:0.0,y:-1.0,z:0.0`:
 
 ![rotation](data/tutorial4/tutorial4_rotation.png)
 
