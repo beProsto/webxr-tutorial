@@ -1,4 +1,4 @@
-let gl = null; // a global gl variable, we will assign our WebGL2 context to it
+let  gl = null; // a global  variable, we will assign our WebGL2 context to it
 const ezgl = { // inside of this object there will be all the basic abstraction
 	VertexBuffer: class { // both vertex buffer and vertex array, whereas the vertex array is here only to store the vertex layout
 		constructor() {

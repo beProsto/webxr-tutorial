@@ -638,7 +638,7 @@ And as I said already - if you don't feel like learning WebGL now, you can still
 
 You can check out the project's files [here](https://github.com/beProsto/webxr-tutorial/tree/master/projects/tutorial3)!
 
-Next: Coming Soon!
+Next: [Matrices and 3D graphics](tutorial4)
 Previous: [Setup - WebGL 2 context initialization](tutorial2)
 
 <div GITHUB_API_ID="3"></div>

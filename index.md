@@ -33,6 +33,7 @@ if your device somehow doesn't support it, i would advise you to bend the abstra
 1. [Setup - the html document](tutorial1)
 2. [Setup - WebGL 2 context initialization](tutorial2)
 3. [A simple WebGL 2 abstraction](tutorial3)
+4. [Matrices and 3D graphics](tutorial4)
 <!-- 5. [WebXR Initialization](tutorial5) --> 
 <!-- 6. [A simple 3D WebXR scene](tutorial6) -->
 <!-- 7. [Finding the controllers](tutorial7) -->
