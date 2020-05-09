@@ -1,6 +1,6 @@
 # WebXR Initialization
 
-## In this episode, after setting everything else up, we're finally going to start doing WebXR.
+## In this article, after setting everything else up, we're finally going to start doing WebXR.
 
 We have to first know how our webxr game loop looks like:
 1. Init function - Creates a WebGL2 context, checks if starting a VR WebXR session is possible, and if it is, makes the button enabled.
