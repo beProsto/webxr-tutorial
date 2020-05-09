@@ -71,9 +71,9 @@ Everything I've shown you up until this point in this tutorial was made up of ps
 
 Still, the knowledge from this tutorial applies, as we will need it in the future, it's useful, helpful and let's you understand what are you even doing. :D
 
-And in the next article we're going to setup a simple WebXR scene. Yes - we're finally going to see something in VR! And - we're going to finally put our `VR not found` button to use!
+And in the next article we're going to setup a WebXR. Yes - we're finally going to see something in VR! And - we're going to finally put our `VR not found` button to use!
 
-Next: Coming Soon!
+Next: [WebXR Initialization](tutorial5)
 Previous: [A simple WebGL 2 abstraction](tutorial3)
 
 <div GITHUB_API_ID="4"></div>
