@@ -138,10 +138,14 @@ const ezgfx = {
 			if(enable && !this.depthTest) {
 				this.masks = gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT;
 				gl.enable(gl.DEPTH_TEST);
+
+				this.depthTest = true;
 			}
 			else if(!enable && this.depthTest) {
 				this.masks = gl.COLOR_BUFFER_BIT;
 				gl.disable(gl.DEPTH_TEST);
+				
+				this.depthTest = false;
 			}
 		}
 		clear(color = [0.0, 0.0, 0.0, 1.0]) {

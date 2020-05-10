@@ -139,7 +139,7 @@ If everything worked correctly, you should see this on your phone after clicking
 
 You can check out the project's files [here](https://github.com/beProsto/webxr-tutorial/tree/master/projects/tutorial5)!
 
-Next: Coming Soon!
+Next: [A simple 3D WebXR scene](tutorial6)
 Previous: [A simple WebGL 2 abstraction](tutorial4)
 
 <div GITHUB_API_ID="5"></div>
