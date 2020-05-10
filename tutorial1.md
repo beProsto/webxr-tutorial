@@ -27,6 +27,8 @@ To be able to connect to it using these devices, you'll have to do these things:
 - Now go to the web browser on your other device, and type in `http://<IP>:8080/`.
 - If your other device connected succesfully, you're good to go!
 
+And that will work for your mobile phones, not so much if you're an owner of oculus quest or go. If, like me, you will want to test your apps on your quest/go, you'll have to also run some kind of traffic forwarding service. One of the best and easiest to use ones is [ngrok](https://ngrok.com/). It works by hosting a public domain that anyone can connect to, that redirects them to your local server. Why do we need something like this for our quest? Well, the fact is, i don't really know. Up until recently it was possible to connect and play games hosted on local servers in the network your quest was connected to. Unfortunetely, it's impossible now, because of some kind of security issues. Mainly it's because quest now doesn't support WebXR/WebVR experiences through an `http` connection. We have to use an `https` connection instead, which means that we can't test games through localhost, as it works in the "http only" kind of mode. This is where `ngrok` comes in, letting you grant acces to your server through an `https` connection.
+
 Our project, being a web project, needs an html document. 
 Fortunetly for us, WebXR doesn't require anything hard to do in our html document.
 We just setup a simple html document with a twist of it having one button, and some meta tags that make our app work properly on mobile devices.

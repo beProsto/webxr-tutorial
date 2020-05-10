@@ -89,3 +89,17 @@ triangleMaterial.setModel(triangleModelMatrix);
 
 Now we should see our triangle like this:
 ![screenshot](data/tutorial6/tutorial6_screenshot2.jpg)
+
+And just for the sake of testing, I tried it on my oculus quest (the navigation bar is there because I had to open it to take the screenshot):
+![screenshot](data/tutorial6/tutorial6_screenshot3.jpg)
+
+When trying your applications out on the quest, remember to connect through [ngrok](https://ngrok.com/)'s https address.
+
+You can check out the project's files [here](https://github.com/beProsto/webxr-tutorial/tree/master/projects/tutorial6)!
+
+Next: Coming Soon!
+Previous: [WebXR Initialization](tutorial5)
+
+<div GITHUB_API_ID="6"></div>
+
+{% include comments.html %}
