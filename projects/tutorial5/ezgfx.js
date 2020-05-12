@@ -54,6 +54,7 @@ const ezgfx = {
 
 			this.shader.bind();
 			this.textures = [];
+			this.shader.set4f("u_Color", 1.0, 1.0, 1.0, 1.0);
 			for(let i = 0; i < 16; i++) {
 				this.shader.set1i("u_TexID[" + i + "]", i);
 			}
@@ -79,6 +80,11 @@ const ezgfx = {
 			this.shader.unbind();
 		}
 
+		setColor(rgba = [1.0, 1.0, 1.0, 1.0]) {
+			this.shader.bind();
+			this.shader.set4f("u_Color", rgba[0], rgba[1], rgba[2], rgba[3], rgba[4]);
+			this.shader.unbind();
+		}
 		setTexture(texture, slot = 0) {
 			this.textures[slot] = texture.texture;
 		}
@@ -98,6 +104,7 @@ const ezgfx = {
 			\n\
 			in vec2 v_TexCoord;\n\
 			\n\
+			uniform vec4 u_Color;\n\
 			uniform sampler2D u_TexID[16];\n";
 			ezgfxGlobals.fSSC1 = "\nvoid main() {\n\
 				o_Color = shader();\n\
@@ -120,7 +127,7 @@ const ezgfx = {
 				v_TexCoord = a_TexCoord;\n\
 				v_TexCoord.y = 1.0 - v_TexCoord.y;\n\
 			}");
-			ezgfxGlobals.fSS = new ezgl.SubShader(gl.FRAGMENT_SHADER, ezgfxGlobals.fSSC0 + "\nvec4 shader() { return vec4(1.0); }\n" + ezgfxGlobals.fSSC1),
+			ezgfxGlobals.fSS = new ezgl.SubShader(gl.FRAGMENT_SHADER, ezgfxGlobals.fSSC0 + "\nvec4 shader() { return u_Color; }\n" + ezgfxGlobals.fSSC1),
 				
 			ezgfxGlobals.triangle = [
 					-0.5, -0.5, 0.0,
@@ -144,7 +151,7 @@ const ezgfx = {
 			else if(!enable && this.depthTest) {
 				this.masks = gl.COLOR_BUFFER_BIT;
 				gl.disable(gl.DEPTH_TEST);
-				
+
 				this.depthTest = false;
 			}
 		}

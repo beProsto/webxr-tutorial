@@ -56,29 +56,47 @@ function onSessionStarted(_session) { // this function defines what happens when
 	
 	
 	const renderer = new ezgfx.Renderer();
+	renderer.depthTesting(true); // if you don't know what that means - it means that our meshes will be rendered properly ¯\_(ツ)_/¯
 
-	const triangleMesh = new ezgfx.Mesh();
-	triangleMesh.loadFromData(ezgfxGlobals.triangle);
-
-	const triangleMaterial = new ezgfx.Material();
 	const identityMatrix = new Float32Array([
 		1.0, 0.0, 0.0, 0.0,
 		0.0, 1.0, 0.0, 0.0,
 		0.0, 0.0, 1.0, 0.0,
 		0.0, 0.0, 0.0, 1.0
 	]);
-	const triangleModelMatrix = new Float32Array([
+	const offsetMatrix = new Float32Array([
 		1.0, 0.0, 0.0, 0.0,
 		0.0, 1.0, 0.0, 0.0,
-		0.0, 0.0, 0.0, 0.0,
-		0.0, 0.0, -3.0, 1.0 // the first element of this row is for x position, the second for y and the third for z, which means we just offset it by negative three on the z axis
+		0.0, 0.0, 1.0, 0.0,
+		-2.0, 1.0, -5.0, 1.0
 	]);
-	triangleMaterial.setProjection(identityMatrix);
-	triangleMaterial.setView(identityMatrix);
-	triangleMaterial.setModel(triangleModelMatrix);
+	
+	const planeMesh = new ezgfx.Mesh();
+	planeMesh.loadFromOBJ("/plane.obj");
+
+	const planeMaterial = new ezgfx.Material();
+	planeMaterial.setProjection(identityMatrix);
+	planeMaterial.setView(identityMatrix);
+	planeMaterial.setModel(identityMatrix);
+
+	planeMaterial.setColor([0.5, 0.5, 0.5, 1.0]);
+
+	const cubeMesh = new ezgfx.Mesh();
+	cubeMesh.loadFromOBJ("/cube.obj");
+
+	const cubeMaterial = new ezgfx.Material();
+	cubeMaterial.setProjection(identityMatrix);
+	cubeMaterial.setView(identityMatrix);
+	cubeMaterial.setModel(offsetMatrix);
+
+	cubeMaterial.setColor([0.4, 0.3, 1.0, 1.0]);
 
 	xrSession.requestReferenceSpace("local").then((refSpace) => { // we request our referance space - an object that defines where the center of our space lies. Here we request a local referance space - that one defines the center of the world to be where player's head is at the start of our application.
 		xrRefSpace = refSpace; // we set our referance space to be the one returned by this function
+		
+		const offsetTransform = new XRRigidTransform({x: 0.0, y: -1.6, z: 0.0}); // creates a transform with position of -1.6
+		xrRefSpace = xrRefSpace.getOffsetReferenceSpace(offsetTransform); // offsets our referance space by the transform
+
 		xrSession.requestAnimationFrame(onSessionFrame); // at this point everything has been set up, so we can finally request an animation frame, on a function with the name of onSessionFrame
 	});
 
@@ -98,10 +116,15 @@ function onSessionStarted(_session) { // this function defines what happens when
 				let viewport = glLayer.getViewport(view); // we get the viewport of our view (the place on the screen where things will be drawn)
 				gl.viewport(viewport.x, viewport.y, viewport.width, viewport.height); // we set our viewport appropriately
 	
-				triangleMaterial.setProjection(view.projectionMatrix);
-				triangleMaterial.setView(view.transform.inverse.matrix);
+				planeMaterial.setProjection(view.projectionMatrix);
+				planeMaterial.setView(view.transform.inverse.matrix);
 				
-				renderer.draw(triangleMesh, triangleMaterial);
+				renderer.draw(planeMesh, planeMaterial);
+
+				cubeMaterial.setProjection(view.projectionMatrix);
+				cubeMaterial.setView(view.transform.inverse.matrix);
+				
+				renderer.draw(cubeMesh, cubeMaterial);
 			}
 		}
 	}
