@@ -168,29 +168,29 @@ const offsetMatrix = new Float32Array([
 cubeMaterial.setModel(offsetMatrix);
 ```
 
-And now, let's fix our `floor on the head level` problems. There are two ways to approach this, both valid, but in this case I will be in favor of one of them. So we can: make yet another offset matrix `or` offset our whole referance space. I will be going with offsetting the referance space, because it's the way in which later on everything will be easier for us. 
+And now, let's fix our `floor on the head level` problems. There are a couple ways to approach this issue, the best one will be to just use a `local-floor` referance space instead of a `local` one. It will set our world's origin to be the ground and not the head's starting position.
 
-The problem here is that we know we have to offset the referance space, but we don't know how much, because we don't know the player's height. The worst part about it is the fact that WebXR itself doesn't have any kind of `getPlayerHeight` or `requestFloorOffset` function, instead they advise you to assume the player's height. Of course, it's not the best solution there could be, it's just the best solution there is (for WebXR, I mean). We will assume the player's height is `1.6` meters.
-
-So to implement our world's offset by `1.6` meters, we'll have to go over to the `xrSession.requestReferenceSpace` part of our code, and put this over there:
+So to implement our `local-floor` referance space, first we'll have to set it as a required feature by our session. That's how we should do it:
 ```js
-xrSession.requestReferenceSpace("local").then((refSpace) => { // we request our referance space - an object that defines where the center of our space lies. Here we request a local referance space - that one defines the center of the world to be where player's head is at the start of our application.
+navigator.xr.requestSession("immersive-vr", {requiredFeatures: ["local-floor"]}).then(onSessionStarted); // request it (start the session), and when the request is handled, call onSessionStarted
+```
+
+We simply put that in the place where we normally requested our session. Then, we'll just request a `local-floor` referance space:
+```js
+xrSession.requestReferenceSpace("local-floor").then((refSpace) => { // we request our referance space - an object that defines where the center of our space lies. Here we request a local-floor referance space - that one defines the center of the world to be where the center of the ground is
 	xrRefSpace = refSpace; // we set our referance space to be the one returned by this function
-		
-	const offsetTransform = new XRRigidTransform({x: 0.0, y: -1.6, z: 0.0}); // creates a transform with position of -1.6
-	xrRefSpace = xrRefSpace.getOffsetReferenceSpace(offsetTransform); // offsets our referance space by the transform
 
 	xrSession.requestAnimationFrame(onSessionFrame); // at this point everything has been set up, so we can finally request an animation frame, on a function with the name of onSessionFrame
 });
 ```
 
-As you see, these two lines changed everything, if we check on our application now, that's what we should see:
+As you see, these two changes made a world of difference, if we check on our application now, that's what we should see:
 
 ![screenshot](data/tutorial6/tutorial6_screenshot6.jpg)
 
 You can check out the project's files [here](https://github.com/beProsto/webxr-tutorial/tree/master/projects/tutorial6)!
 
-Next: Coming Soon!
+Next: [Finding the controllers](tutorial7)
 Previous: [WebXR Initialization](tutorial5)
 
 <div GITHUB_API_ID="6"></div>

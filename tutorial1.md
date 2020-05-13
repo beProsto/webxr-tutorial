@@ -156,6 +156,10 @@ After all this, your code should look like this:
 </html>
 ```
 
+From now on, we will be slowly, but surely dipping our toes into VR.
+
+![cat](data/tutorial1/tutorial1_cat.png)
+
 You can check out the project's files [here](https://github.com/beProsto/webxr-tutorial/tree/master/projects/tutorial1)!
 
 Next: [Setup - WebGL 2 context initialization](tutorial2)

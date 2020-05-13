@@ -9,6 +9,19 @@ let xrButton = document.getElementById("xr-button");
 let xrSession = null;
 let xrRefSpace = null;
 
+let controllers = {};
+
+function onControllerUpdate(session, frame) { // this function will be called every frame, before rendering
+	for(let inputSource of session.inputSources) { // we loop through every input source (controller) caught by our session
+		if(inputSource.gripSpace) { // we check if our controllers actually have their space
+			let gripPose = frame.getPose(inputSource.gripSpace, xrRefSpace); // we get controller's pose, by comparing our controller's space to our referance space
+			if(gripPose) { // we check if our controller's pose was gotten correctly
+				controllers[inputSource.handedness] = {pose: gripPose}; // inputSource.handedness returns a string representing in which hand we have our controller - that is "left" or "right". Which means that controllers.left and controllers.right will from now on contain an element named "pose", which will simply be their corresponding XRPose
+			}
+		}
+	}
+}
+
 function onResize() { // this function resizes our canvas in a way, that makes it fit the entire screen perfectly!
 	canvas.width = canvas.clientWidth * window.devicePixelRatio;
 	canvas.height = canvas.clientHeight * window.devicePixelRatio;
@@ -91,6 +104,14 @@ function onSessionStarted(_session) { // this function defines what happens when
 
 	cubeMaterial.setColor([0.4, 0.3, 1.0, 1.0]);
 
+	const controllerMesh = new ezgfx.Mesh();
+	controllerMesh.loadFromOBJ("/controller.obj");
+
+	const controllerMaterial = new ezgfx.Material();
+	controllerMaterial.setProjection(identityMatrix);
+	controllerMaterial.setView(identityMatrix);
+	controllerMaterial.setModel(identityMatrix);
+
 	xrSession.requestReferenceSpace("local-floor").then((refSpace) => { // we request our referance space - an object that defines where the center of our space lies. Here we request a local-floor referance space - that one defines the center of the world to be where the center of the ground is
 		xrRefSpace = refSpace; // we set our referance space to be the one returned by this function
 		
@@ -101,10 +122,12 @@ function onSessionStarted(_session) { // this function defines what happens when
 		const session = frame.session; // frame is a frame handling object - it's used to get frame sessions, frame WebGL layers and some more things
 		session.requestAnimationFrame(onSessionFrame); // we simply set our animation frame function to be this function again
 		let pose = frame.getViewerPose(xrRefSpace); // gets the pose of the headset, relative to the previously gotten referance space
-	
+
 		if(pose) { // if the pose was possible to get (if the headset responds)
 			let glLayer = session.renderState.baseLayer; // get the WebGL layer (it contains some important information we need)
 	
+			onControllerUpdate(session, frame); // update the controllers' state
+
 			gl.bindFramebuffer(gl.FRAMEBUFFER, glLayer.framebuffer); // sets the framebuffer (drawing target of WebGL) to be our WebXR display's framebuffer
 			
 			renderer.clear([0.3, 1.0, 0.4, 1.0]);
@@ -122,6 +145,25 @@ function onSessionStarted(_session) { // this function defines what happens when
 				cubeMaterial.setView(view.transform.inverse.matrix);
 				
 				renderer.draw(cubeMesh, cubeMaterial);
+			
+				if(controllers.left) { // checks if WebXR got our left controller
+					controllerMaterial.setProjection(view.projectionMatrix);
+					controllerMaterial.setView(view.transform.inverse.matrix);
+					controllerMaterial.setModel(controllers.left.pose.transform.matrix); // we just get our model matrix for the controller
+					
+					controllerMaterial.setColor([1.0, 1.0, 1.0, 1.0]); // color white
+
+					renderer.draw(controllerMesh, controllerMaterial);
+				}
+				if(controllers.right) { // checks if WebXR got our right controller
+					controllerMaterial.setProjection(view.projectionMatrix);
+					controllerMaterial.setView(view.transform.inverse.matrix);
+					controllerMaterial.setModel(controllers.right.pose.transform.matrix); // we just get our model matrix for the controller
+					
+					controllerMaterial.setColor([0.0, 0.0, 0.0, 1.0]); // color black
+
+					renderer.draw(controllerMesh, controllerMaterial);
+				}
 			}
 		}
 	}
