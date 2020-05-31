@@ -37,7 +37,7 @@ if your device somehow doesn't support it, i would advise you to bend the abstra
 5. [WebXR Initialization](tutorial5)
 6. [A simple 3D WebXR scene](tutorial6)
 7. [Finding the controllers](tutorial7)
-<!-- 8. [Reading the controllers' input](tutorial8) -->
+8. [Reading the controllers' input](tutorial8)
 <!-- 9. [Fun - making the player move around with thumbsticks](tutorial9) -->
 <!-- 10. [Fun - playing with 3D physics](tutorial10) -->
 <!-- 11. [Fun - playing with guns](tutorial11) -->

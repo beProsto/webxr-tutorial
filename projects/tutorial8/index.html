@@ -1,0 +1,44 @@
+<!doctype html>
+
+<html>
+	<head>
+		<title>A neat little WebXR example</title>
+		
+		<style>
+			body {
+				background-color: rgb(100, 100, 100);
+			}
+			#header {
+				color: rgb(242, 245, 78);
+			}
+			#xr-button {
+				background-color: rgba(116, 181, 241, 0.4);
+				border: rgb(95, 145, 195) 2px solid;
+				color: white;
+				height: 50px;
+				min-width: 160px;
+			}
+			#main {
+				text-align: center;
+			}
+		</style>
+
+		<meta charset="utf-8">
+
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+		<meta name="mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+	</head>
+
+	<body>
+		<header id="main">
+			<h2 id="header">WebXR VR Test</h2>
+			<button id="xr-button" disabled>VR not found</button>
+		</header>
+
+		<script type="text/javascript" src="ezgl.js"></script>
+		<script type="text/javascript" src="ezobj.js"></script>
+		<script type="text/javascript" src="ezgfx.js"></script>
+		<script type="module" src="index.js"></script>
+	</body>
+</html>

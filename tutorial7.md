@@ -127,7 +127,7 @@ And now we should see our big, beefy, black and white minecraft-like hands:
 
 You can check out the project's files [here](https://github.com/beProsto/webxr-tutorial/tree/master/projects/tutorial7)!
 
-Next: Coming Soon!
+Next: [Reading the controllers' input](tutorial8)
 Previous: [A simple 3D WebXR scene](tutorial6)
 
 <div GITHUB_API_ID="7"></div>
