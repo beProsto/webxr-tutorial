@@ -208,7 +208,7 @@ function onSessionStarted(_session) { // this function defines what happens when
 			zOffset *= 0.1;
 
 			xrRefSpace = xrRefSpace.getOffsetReferenceSpace(new XRRigidTransform({x: xOffset, y: 0.0, z: zOffset})); // we offset our reference space
-
+			
 			gl.bindFramebuffer(gl.FRAMEBUFFER, glLayer.framebuffer); // sets the framebuffer (drawing target of WebGL) to be our WebXR display's framebuffer
 			
 			renderer.clear([0.3, 1.0, 0.4, 1.0]);
