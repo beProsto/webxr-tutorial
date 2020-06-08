@@ -2,68 +2,12 @@
 import WebXRPolyfill from "https://cdn.jsdelivr.net/npm/webxr-polyfill@latest/build/webxr-polyfill.module.js";
 const polyfill = new WebXRPolyfill();
 
-function matFromQuat(out, q) { // ripped this straight out of the glMatrix lib
-	let x = q[0],
-	  y = q[1],
-	  z = q[2],
-	  w = q[3];
-	let x2 = x + x;
-	let y2 = y + y;
-	let z2 = z + z;
-  
-	let xx = x * x2;
-	let yx = y * x2;
-	let yy = y * y2;
-	let zx = z * x2;
-	let zy = z * y2;
-	let zz = z * z2;
-	let wx = w * x2;
-	let wy = w * y2;
-	let wz = w * z2;
-  
-	out[0] = 1 - yy - zz;
-	out[1] = yx + wz;
-	out[2] = zx - wy;
-	out[3] = 0;
-  
-	out[4] = yx - wz;
-	out[5] = 1 - xx - zz;
-	out[6] = zy + wx;
-	out[7] = 0;
-  
-	out[8] = zx + wy;
-	out[9] = zy - wx;
-	out[10] = 1 - xx - yy;
-	out[11] = 0;
-  
-	out[12] = 0;
-	out[13] = 0;
-	out[14] = 0;
-	out[15] = 1;
-}
+// this function multiplies a 4d vector by a 4x4 matrix (it applies all the matrix operations to the vector)
 function mulVecByMat(out, m, v) {
 	out[0] = m[0] * v[0] + m[1] * v[1] + m[2] * v[2] + m[3] * v[3];
 	out[1] = m[4] * v[0] + m[5] * v[1] + m[6] * v[2] + m[7] * v[3];
 	out[2] = m[8] * v[0] + m[9] * v[1] + m[10] * v[2] + m[11] * v[3];
 	out[3] = m[12] * v[0] + m[13] * v[1] + m[14] * v[2] + m[15] * v[3];
-}
-function getDirectionFromQuat(q, forward) {
-	let matrix = new Float32Array([
-		1.0, 0.0, 0.0, 0.0,
-		0.0, 1.0, 0.0, 0.0,
-		0.0, 0.0, 1.0, 0.0,
-		0.0, 0.0, 0.0, 1.0
-	]);
-	let vec = new Float32Array([0.0, 0.0, 0.0, 1.0]);
-	let forw = new Float32Array([forward[0], forward[1], forward[2], 1.0]);
-	
-	matFromQuat(matrix, q);
-	mulVecByMat(vec, matrix, forw);
-
-	return vec;
-}
-function dirFromQuatXR(q, forward) {
-	return getDirectionFromQuat([q.x, q.y, q.z, q.w], forward);
 }
 
 let canvas = null; // we'll keep it as a global object
@@ -192,14 +136,26 @@ function onSessionStarted(_session) { // this function defines what happens when
 	
 			onControllerUpdate(session, frame); // update the controllers' state
 			
-			// we get our controller's direction, based on it's rotation
-			const dir = dirFromQuatXR(controllers.left.pose.transform.orientation, [0.0, 0.0, -1.0]);
+			// we get our controller's center and front
+			let front = [0.0, 0.0, 0.0, 1.0];
+			let center = [0.0, 0.0, 0.0, 1.0];
 
-			// we make it easier to use
-			let xDir = -dir[0];
-			let zDir = dir[1];
+			let matrix = controllers.left.pose.transform.matrix;
 
-			// we set our offsets up
+			mulVecByMat(front, matrix, [0.0, 0.0, -1.0, 1.0]);
+			mulVecByMat(center, matrix, [0.0, 0.0, 0.0, 1.0]);
+
+			// we convert front and center into the direction
+			let xDir = front[0] - center[0];
+			let zDir = front[1] - center[1];
+			xDir = -xDir;
+
+			// we normalize the direction
+			const l = Math.sqrt(xDir * xDir + zDir * zDir);
+			xDir = xDir / l;
+			zDir = zDir / l;
+
+			// we set our offsets up, this will include both the direction of the controller and the direction of our analog sticks
 			let xOffset = controllers.left.gamepad.axes[3] * xDir + controllers.left.gamepad.axes[2] * zDir;
 			let zOffset = controllers.left.gamepad.axes[3] * zDir - controllers.left.gamepad.axes[2] * xDir;
 
@@ -207,7 +163,8 @@ function onSessionStarted(_session) { // this function defines what happens when
 			xOffset *= 0.1; 
 			zOffset *= 0.1;
 
-			xrRefSpace = xrRefSpace.getOffsetReferenceSpace(new XRRigidTransform({x: xOffset, y: 0.0, z: zOffset})); // we offset our reference space
+			// we offset our reference space
+			xrRefSpace = xrRefSpace.getOffsetReferenceSpace(new XRRigidTransform({x: xOffset, y: 0.0, z: zOffset})); 
 			
 			gl.bindFramebuffer(gl.FRAMEBUFFER, glLayer.framebuffer); // sets the framebuffer (drawing target of WebGL) to be our WebXR display's framebuffer
 			
