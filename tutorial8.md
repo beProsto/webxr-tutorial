@@ -118,6 +118,7 @@ And our final result is being able to move around the scene!
 
 You can check out the project's files [here](https://github.com/beProsto/webxr-tutorial/tree/master/projects/tutorial8)!
 
+Next: [Experimenting with lighting](tutorial9)
 Previous: [Finding the controllers](tutorial7)
 
 <div GITHUB_API_ID="8"></div>

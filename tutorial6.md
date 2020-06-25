@@ -188,6 +188,8 @@ As you see, these two changes made a world of difference, if we check on our app
 
 ![screenshot](data/tutorial6/tutorial6_screenshot6.jpg)
 
+To have a little fun, we'll do some shading on these. How - you might ask - well, it's pretty simple; we'll have to write a custom fragment shader. Don't you worry - it will be very straight forward.
+
 You can check out the project's files [here](https://github.com/beProsto/webxr-tutorial/tree/master/projects/tutorial6)!
 
 Next: [Finding the controllers](tutorial7)
