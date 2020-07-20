@@ -15,10 +15,12 @@ We can deduce how much will our pixel be brighten up by getting it's normal and 
 
 The dot product works by defining how different, or in how different directions the vectors point. It does it on a scale from 1.0 (identical) to -1.0 (they are pointing into the opposite directions). For our use case we will:
 1. Get the dot product between our sunlight direction and the normal.
-2. Limit our dot product's result from `1.0` - `-1.0` to just `1.0` - `0.0`.
+2. Limit our dot product's result from `1.0` - `-1.0` to just `1.0` - `0.0`(in our case we don't have to do so, because every value of an output color that's lower than `0.0` will be set to it, but it's something to keep in mind).
 3. Multiply the end result by our color.
 
+So now - let's code it! First, we'll have to modify our shader situation, as it only allows the user to modify the fragment shader. What we'll do is a simple and dirty fix - we'll just let the user modify the vertex shader too.
 
+These are the modifications we'll have to do to our `ezgfx.js` file to make it possible:
 
 You can check out the project's files [here](https://github.com/beProsto/webxr-tutorial/tree/master/projects/tutorial9)!
 
