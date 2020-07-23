@@ -38,9 +38,25 @@ const ezgfx = {
 		}
 	},
 	Material: class {
-		constructor(customShader = null) {
+		constructor(customVertex = null, customTexCoord = null, customShader = null) {
 			this.shader = new ezgl.Shader();
-			this.shader.join(ezgfxGlobals.vSS);
+			let vSS = null;
+			if(!customVertex && !customTexCoord) {
+				this.shader.join(ezgfxGlobals.vSS);
+			}
+			else if(customVertex && customTexCoord) {
+				vSS = new ezgl.SubShader(gl.VERTEX_SHADER, ezgfxGlobals.vSSC0 + customVertex + "\n" + customTexCoord + ezgfxGlobals.vSSC1);
+				this.shader.join(vSS);
+			}
+			else if(!customVertex && customTexCoord) {
+				vSS = new ezgl.SubShader(gl.VERTEX_SHADER, ezgfxGlobals.vSSC0 + "vec4 vertex() { return u_Projection * u_View * u_Model * vec4(a_Position, 1.0); }\n" + customTexCoord + ezgfxGlobals.vSSC1);
+				this.shader.join(vSS);
+			}
+			else if(customVertex && !customTexCoord) {
+				vSS = new ezgl.SubShader(gl.VERTEX_SHADER, ezgfxGlobals.vSSC0 + customVertex + "\nvec2 texcoord() { return a_TexCoord; }" + ezgfxGlobals.vSSC1);
+				this.shader.join(vSS);
+			}
+
 			if(!customShader) {
 				this.shader.join(ezgfxGlobals.fSS);
 				this.shader.link();
@@ -50,6 +66,10 @@ const ezgfx = {
 				this.shader.join(fSS);
 				this.shader.link();
 				fSS.free();
+			}
+
+			if(vSS) {
+				vSS.free();
 			}
 
 			this.shader.bind();
@@ -109,7 +129,7 @@ const ezgfx = {
 			ezgfxGlobals.fSSC1 = "\nvoid main() {\n\
 				o_Color = shader();\n\
 			}";
-			ezgfxGlobals.vSS = new ezgl.SubShader(gl.VERTEX_SHADER, "#version 300 es\n\
+			ezgfxGlobals.vSSC0 = "#version 300 es\n\
 			precision mediump float;\n\
 			\n\
 			layout(location = 0) in vec3 a_Position;\n\
@@ -120,14 +140,14 @@ const ezgfx = {
 			uniform mat4 u_View;\n\
 			uniform mat4 u_Model;\n\
 			\n\
-			out vec2 v_TexCoord;\n\
-			\n\
-			void main() {\n\
-			gl_Position = u_Projection * u_View * u_Model * vec4(a_Position, 1.0);\n\
-				v_TexCoord = a_TexCoord;\n\
+			out vec2 v_TexCoord;\n";
+			ezgfxGlobals.vSSC1 = "\nvoid main() {\n\
+				gl_Position = vertex();\n\
+				v_TexCoord = texcoord();\n\
 				v_TexCoord.y = 1.0 - v_TexCoord.y;\n\
-			}");
-			ezgfxGlobals.fSS = new ezgl.SubShader(gl.FRAGMENT_SHADER, ezgfxGlobals.fSSC0 + "\nvec4 shader() { return u_Color; }\n" + ezgfxGlobals.fSSC1),
+			}";
+			ezgfxGlobals.vSS = new ezgl.SubShader(gl.VERTEX_SHADER, ezgfxGlobals.vSSC0 + "\nvec4 vertex() { return u_Projection * u_View * u_Model * vec4(a_Position, 1.0); }\nvec2 texcoord() { return a_TexCoord; }\n" + ezgfxGlobals.vSSC1);
+			ezgfxGlobals.fSS = new ezgl.SubShader(gl.FRAGMENT_SHADER, ezgfxGlobals.fSSC0 + "\nvec4 shader() { return u_Color; }\n" + ezgfxGlobals.fSSC1);
 				
 			ezgfxGlobals.triangle = [
 					-0.5, -0.5, 0.0,
@@ -165,7 +185,9 @@ const ezgfx = {
 		draw(mesh, material) {
 			material.shader.bind();
 			for(let i = 0; i < material.textures.size; i++) {
-				material.textures[i].bind(i);
+				if(material.textures[i]) {
+					material.textures[i].bind(i);
+				}
 			}
 			mesh.vertexbuffer.draw();
 			material.shader.unbind();

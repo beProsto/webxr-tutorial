@@ -22,6 +22,96 @@ So now - let's code it! First, we'll have to modify our shader situation, as it 
 
 These are the modifications we'll have to do to our `ezgfx.js` file to make it possible:
 
+First, let's divide the vertex shader's code into 2 halves, between them we will have to define a function called `vertex`.
+
+Let's change this:
+```js
+ezgfxGlobals.vSS = new ezgl.SubShader(gl.VERTEX_SHADER, "#version 300 es\n\
+			precision mediump float;\n\
+			\n\
+			layout(location = 0) in vec3 a_Position;\n\
+			layout(location = 1) in vec2 a_TexCoord;\n\
+			layout(location = 2) in vec3 a_Normal;\n\
+			\n\
+			uniform mat4 u_Projection;\n\
+			uniform mat4 u_View;\n\
+			uniform mat4 u_Model;\n\
+			\n\
+			out vec2 v_TexCoord;\n\
+			\n\
+			void main() {\n\
+			gl_Position = u_Projection * u_View * u_Model * vec4(a_Position, 1.0);\n\
+				v_TexCoord = a_TexCoord;\n\
+				v_TexCoord.y = 1.0 - v_TexCoord.y;\n\
+			}");
+```
+
+Into this:
+```js
+ezgfxGlobals.vSSC0 = "#version 300 es\n\
+precision mediump float;\n\
+\n\
+layout(location = 0) in vec3 a_Position;\n\
+layout(location = 1) in vec2 a_TexCoord;\n\
+layout(location = 2) in vec3 a_Normal;\n\
+\n\
+uniform mat4 u_Projection;\n\
+uniform mat4 u_View;\n\
+uniform mat4 u_Model;\n\
+\n\
+out vec2 v_TexCoord;\n";
+ezgfxGlobals.vSSC1 = "\nvoid main() {\n\
+	gl_Position = vertex();\n\
+	v_TexCoord = texcoord();\n\
+	v_TexCoord.y = 1.0 - v_TexCoord.y;\n\
+}";
+ezgfxGlobals.vSS = new ezgl.SubShader(gl.VERTEX_SHADER, ezgfxGlobals.vSSC0 + "\nvec4 vertex() { return u_Projection * u_View * u_Model * vec4(a_Position, 1.0); }\nvec2 texcoord() { return a_TexCoord; }\n" + ezgfxGlobals.vSSC1);
+```
+
+Now after we've modified our shaders this way, we can add a way to write our own vertex and texcoord functions. For that, we modify the Material class constructor:
+```js
+Material: class {
+		constructor(customVertex = null, customTexCoord = null, customShader = null) {
+			this.shader = new ezgl.Shader();
+			let vSS = null;
+			if(!customVertex && !customTexCoord) {
+				this.shader.join(ezgfxGlobals.vSS);
+			}
+			else if(customVertex && customTexCoord) {
+				vSS = new ezgl.SubShader(gl.VERTEX_SHADER, ezgfxGlobals.vSSC0 + customVertex + "\n" + customTexCoord + ezgfxGlobals.vSSC1);
+				this.shader.join(vSS);
+			}
+			else if(!customVertex && customTexCoord) {
+				vSS = new ezgl.SubShader(gl.VERTEX_SHADER, ezgfxGlobals.vSSC0 + "vec4 vertex() { return u_Projection * u_View * u_Model * vec4(a_Position, 1.0); }\n" + customTexCoord + ezgfxGlobals.vSSC1);
+				this.shader.join(vSS);
+			}
+			else if(customVertex && !customTexCoord) {
+				vSS = new ezgl.SubShader(gl.VERTEX_SHADER, ezgfxGlobals.vSSC0 + customVertex + "\nvec2 texcoord() { return a_TexCoord; }" + ezgfxGlobals.vSSC1);
+				this.shader.join(vSS);
+			}
+
+			if(!customShader) {
+				this.shader.join(ezgfxGlobals.fSS);
+				this.shader.link();
+			}
+			else {
+				let fSS = new ezgl.SubShader(gl.FRAGMENT_SHADER, ezgfxGlobals.fSSC0 + customShader + ezgfxGlobals.fSSC1); 
+				this.shader.join(fSS);
+				this.shader.link();
+				fSS.free();
+			}
+
+			if(vSS) {
+				vSS.free();
+			}
+```
+
+Simple enough, ain't it? So what will happen now is that whenever we create our Material we will be able to choose if we want to write our own vertex, texcoord and pixel (shading) functions. That would be the example of use:
+```js
+// A material with custom vertex and pixel shading functions
+const material = new Material("vec4 vertex() { return u_Projection * u_View * u_Model * vec4(a_Position, 1.0); }", null, "vec4 shader() { return u_Color * vec4(vec3(0.2), 1.0); }"); 
+```
+
 You can check out the project's files [here](https://github.com/beProsto/webxr-tutorial/tree/master/projects/tutorial9)!
 
 Previous: [Reading the controllers' input](tutorial8)
