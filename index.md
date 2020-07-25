@@ -38,3 +38,4 @@ if your device somehow doesn't support it, i would advise you to bend the abstra
 6. [A simple 3D WebXR scene](tutorial6)
 7. [Finding the controllers](tutorial7)
 8. [Reading the controllers' input](tutorial8)
+9. [Experimenting with lighting](tutorial9)
