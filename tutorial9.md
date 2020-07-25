@@ -192,6 +192,11 @@ if(controllers.left) {
 
 And when it comes to the code that renders our controllers - it does check if they were detected, so we don't need to change anything there. :D
 
+If we go on to testing out our application, this is what we should see:
+![screenshot](data/tutorial9/tutorial9_screenshot.png)
+
+In the next episode we're going to go about doing 3D audio!
+
 You can check out the project's files [here](https://github.com/beProsto/webxr-tutorial/tree/master/projects/tutorial9)!
 
 Previous: [Reading the controllers' input](tutorial8)
