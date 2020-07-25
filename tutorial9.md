@@ -112,6 +112,86 @@ Simple enough, ain't it? So what will happen now is that whenever we create our 
 const material = new Material("vec4 vertex() { return u_Projection * u_View * u_Model * vec4(a_Position, 1.0); }", null, "vec4 shader() { return u_Color * vec4(vec3(0.2), 1.0); }"); 
 ```
 
+Now, that we've done all of this hard prepwork, let's write our lighting shader!
+```js
+const lightShader = {
+	vertex: "\n\
+	out float v_Brightness;\n\
+	vec4 vertex() {\
+		\
+		vec3 lightDirection = normalize(vec3(1.0, -1.0, -1.0));\
+		\
+		vec4 worldPoint = u_Model * vec4(a_Position, 1.0);\
+		vec4 worldPointPlusNormal = u_Model * vec4(a_Position + normalize(a_Normal), 1.0);\
+		\
+		v_Brightness = -dot(normalize(worldPointPlusNormal.xyz - worldPoint.xyz), lightDirection);\
+		\
+		return u_Projection * u_View * worldPoint;\
+	}",
+	shader: "\
+	in float v_Brightness;\
+	vec4 shader() {\
+		return vec4(u_Color.rgb * vec3(v_Brightness), 1.0);\
+	}"
+};
+```
+
+Now, let's make all our materials use these shaders:
+
+```js
+const planeMaterial = new ezgfx.Material(lightShader.vertex, null, lightShader.shader);
+```
+
+```js
+const cubeMaterial = new ezgfx.Material(lightShader.vertex, null, lightShader.shader);
+```
+
+```js
+const controllerMaterial = new ezgfx.Material(lightShader.vertex, null, lightShader.shader);
+```
+
+When trying to test this thing out, I ran into a problem: no matter what i would do my phone's screen would always be black. Only after I've done some debugging (as in - frantically put `alert`s everywhere), I realised that the problem wasn't in any of the shaders, but instead in the fact, that I wrote the code in a way that it assumes we have controllers, which is not the case when it comes to mobile phones. Let's fix it real quick:
+
+We have to put an `if` statement that checks if we have the controllers before the code that moves the player **and** before the code that renders the controllers.
+
+First, the movement code:
+```js
+// we want to let the player move around only if the controller is detected, otherwise we will be trying to use non-existing values, which would crash our application
+if(controllers.left) {
+	// we get our controller's center and front
+	let front = [0.0, 0.0, 0.0, 1.0];
+	let center = [0.0, 0.0, 0.0, 1.0];
+	let matrix = controllers.left.pose.transform.matrix;
+
+	mulVecByMat(front, matrix, [0.0, 0.0, -1.0, 1.0]);
+	mulVecByMat(center, matrix, [0.0, 0.0, 0.0, 1.0]);
+
+	// we convert front and center into the direction
+	let xDir = front[0] - center[0];
+	let zDir = front[1] - center[1];
+
+	xDir = -xDir;
+
+	// we normalize the direction
+	const l = Math.sqrt(xDir * xDir + zDir * zDir);
+	xDir = xDir / l;
+	zDir = zDir / l;
+
+	// we set our offsets up, this will include boththe direction of the controller and the directionof our analog sticks
+	let xOffset = controllers.left.gamepad.axes[3] *xDir + controllers.left.gamepad.axes[2] * zDir;
+	let zOffset = controllers.left.gamepad.axes[3] *zDir - controllers.left.gamepad.axes[2] * xDir;
+
+	// we slow it down a little bit, so that it willnot make us nauseous once we move 
+	xOffset *= 0.1; 
+	zOffset *= 0.1;
+
+	// we offset our reference space
+	xrRefSpace = xrRefSpace.getOffsetReferenceSpace(newXRRigidTransform({x: xOffset, y: 0.0, z: zOffset}); 
+}
+```
+
+And when it comes to the code that renders our controllers - it does check if they were detected, so we don't need to change anything there. :D
+
 You can check out the project's files [here](https://github.com/beProsto/webxr-tutorial/tree/master/projects/tutorial9)!
 
 Previous: [Reading the controllers' input](tutorial8)

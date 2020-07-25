@@ -17,6 +17,28 @@ let xrButton = document.getElementById("xr-button");
 let xrSession = null;
 let xrRefSpace = null;
 
+const lightShader = {
+	vertex: "\n\
+	out float v_Brightness;\n\
+	vec4 vertex() {\
+		\
+		vec3 lightDirection = normalize(vec3(1.0, -1.0, -1.0));\
+		\
+		vec4 worldPoint = u_Model * vec4(a_Position, 1.0);\
+		vec4 worldPointPlusNormal = u_Model * vec4(a_Position + normalize(a_Normal), 1.0);\
+		\
+		v_Brightness = -dot(normalize(worldPointPlusNormal.xyz - worldPoint.xyz), lightDirection);\
+		\
+		return u_Projection * u_View * worldPoint;\
+	}",
+	shader: "\
+	in float v_Brightness;\
+	vec4 shader() {\
+		return vec4(u_Color.rgb * vec3(v_Brightness), 1.0);\
+	}"
+};
+
+
 let controllers = {};
 
 function onControllerUpdate(session, frame) { // this function will be called every frame, before rendering
@@ -95,17 +117,17 @@ function onSessionStarted(_session) { // this function defines what happens when
 	const planeMesh = new ezgfx.Mesh();
 	planeMesh.loadFromOBJ("/plane.obj");
 
-	const planeMaterial = new ezgfx.Material();
+	const planeMaterial = new ezgfx.Material(lightShader.vertex, null, lightShader.shader);
 	planeMaterial.setProjection(identityMatrix);
 	planeMaterial.setView(identityMatrix);
 	planeMaterial.setModel(identityMatrix);
-
+	
 	planeMaterial.setColor([0.5, 0.5, 0.5, 1.0]);
 
 	const cubeMesh = new ezgfx.Mesh();
 	cubeMesh.loadFromOBJ("/cube.obj");
 
-	const cubeMaterial = new ezgfx.Material();
+	const cubeMaterial = new ezgfx.Material(lightShader.vertex, null, lightShader.shader);
 	cubeMaterial.setProjection(identityMatrix);
 	cubeMaterial.setView(identityMatrix);
 	cubeMaterial.setModel(offsetMatrix);
@@ -115,7 +137,7 @@ function onSessionStarted(_session) { // this function defines what happens when
 	const controllerMesh = new ezgfx.Mesh();
 	controllerMesh.loadFromOBJ("/controller.obj");
 
-	const controllerMaterial = new ezgfx.Material();
+	const controllerMaterial = new ezgfx.Material(lightShader.vertex, null, lightShader.shader);
 	controllerMaterial.setProjection(identityMatrix);
 	controllerMaterial.setView(identityMatrix);
 	controllerMaterial.setModel(identityMatrix);
@@ -133,39 +155,42 @@ function onSessionStarted(_session) { // this function defines what happens when
 
 		if(pose) { // if the pose was possible to get (if the headset responds)
 			let glLayer = session.renderState.baseLayer; // get the WebGL layer (it contains some important information we need)
-	
+
 			onControllerUpdate(session, frame); // update the controllers' state
-			
-			// we get our controller's center and front
-			let front = [0.0, 0.0, 0.0, 1.0];
-			let center = [0.0, 0.0, 0.0, 1.0];
 
-			let matrix = controllers.left.pose.transform.matrix;
+			// we want to let the player move around only if the controller is detected, otherwise we will be trying to use non-existing values, which would crash our application
+			if(controllers.left) {
+				// we get our controller's center and front
+				let front = [0.0, 0.0, 0.0, 1.0];
+				let center = [0.0, 0.0, 0.0, 1.0];
 
-			mulVecByMat(front, matrix, [0.0, 0.0, -1.0, 1.0]);
-			mulVecByMat(center, matrix, [0.0, 0.0, 0.0, 1.0]);
+				let matrix = controllers.left.pose.transform.matrix;
 
-			// we convert front and center into the direction
-			let xDir = front[0] - center[0];
-			let zDir = front[1] - center[1];
-			xDir = -xDir;
+				mulVecByMat(front, matrix, [0.0, 0.0, -1.0, 1.0]);
+				mulVecByMat(center, matrix, [0.0, 0.0, 0.0, 1.0]);
 
-			// we normalize the direction
-			const l = Math.sqrt(xDir * xDir + zDir * zDir);
-			xDir = xDir / l;
-			zDir = zDir / l;
+				// we convert front and center into the direction
+				let xDir = front[0] - center[0];
+				let zDir = front[1] - center[1];
+				xDir = -xDir;
 
-			// we set our offsets up, this will include both the direction of the controller and the direction of our analog sticks
-			let xOffset = controllers.left.gamepad.axes[3] * xDir + controllers.left.gamepad.axes[2] * zDir;
-			let zOffset = controllers.left.gamepad.axes[3] * zDir - controllers.left.gamepad.axes[2] * xDir;
+				// we normalize the direction
+				const l = Math.sqrt(xDir * xDir + zDir * zDir);
+				xDir = xDir / l;
+				zDir = zDir / l;
 
-			// we slow it down a little bit, so that it will not make us nauseous once we move 
-			xOffset *= 0.1; 
-			zOffset *= 0.1;
+				// we set our offsets up, this will include both the direction of the controller and the direction of our analog sticks
+				let xOffset = controllers.left.gamepad.axes[3] * xDir + controllers.left.gamepad.axes[2] * zDir;
+				let zOffset = controllers.left.gamepad.axes[3] * zDir - controllers.left.gamepad.axes[2] * xDir;
 
-			// we offset our reference space
-			xrRefSpace = xrRefSpace.getOffsetReferenceSpace(new XRRigidTransform({x: xOffset, y: 0.0, z: zOffset})); 
-			
+				// we slow it down a little bit, so that it will not make us nauseous once we move 
+				xOffset *= 0.1; 
+				zOffset *= 0.1;
+
+				// we offset our reference space
+				xrRefSpace = xrRefSpace.getOffsetReferenceSpace(new XRRigidTransform({x: xOffset, y: 0.0, z: zOffset})); 
+			}
+
 			gl.bindFramebuffer(gl.FRAMEBUFFER, glLayer.framebuffer); // sets the framebuffer (drawing target of WebGL) to be our WebXR display's framebuffer
 			
 			renderer.clear([0.3, 1.0, 0.4, 1.0]);

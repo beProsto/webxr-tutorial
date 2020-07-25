@@ -41,6 +41,7 @@ const ezgfx = {
 		constructor(customVertex = null, customTexCoord = null, customShader = null) {
 			this.shader = new ezgl.Shader();
 			let vSS = null;
+
 			if(!customVertex && !customTexCoord) {
 				this.shader.join(ezgfxGlobals.vSS);
 			}

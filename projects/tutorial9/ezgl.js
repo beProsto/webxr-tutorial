@@ -70,6 +70,7 @@ const ezgl = { // inside of this object there will be all the basic abstraction
 			
 			const message = gl.getShaderInfoLog(this.shader);
 			if(message.length > 0) {
+				alert(message);
 				throw message;
 			}
 		}
