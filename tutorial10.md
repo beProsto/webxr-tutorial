@@ -23,11 +23,6 @@ resonance.output.connect(audioContext.destination);
 audioContext.suspend();
 ```
 
-Now, let's try doing that `createAudioSource` function:
-```js
-
-```
-
 You can check out the project's files [here](https://github.com/beProsto/webxr-tutorial/tree/master/projects/tutorial10)!
 
 Previous: [Experimenting with lighting](tutorial9)
