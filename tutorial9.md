@@ -178,8 +178,8 @@ if(controllers.left) {
 	zDir = zDir / l;
 
 	// we set our offsets up, this will include boththe direction of the controller and the directionof our analog sticks
-	let xOffset = controllers.left.gamepad.axes[3] *xDir + controllers.left.gamepad.axes[2] * zDir;
-	let zOffset = controllers.left.gamepad.axes[3] *zDir - controllers.left.gamepad.axes[2] * xDir;
+	let xOffset = controllers.left.gamepad.axes[3] * xDir + controllers.left.gamepad.axes[2] * zDir;
+	let zOffset = controllers.left.gamepad.axes[3] * zDir - controllers.left.gamepad.axes[2] * xDir;
 
 	// we slow it down a little bit, so that it willnot make us nauseous once we move 
 	xOffset *= 0.1; 
