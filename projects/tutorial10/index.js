@@ -54,9 +54,36 @@ function onControllerUpdate(session, frame) { // this function will be called ev
 // resonance globals
 let audioContext = new AudioContext();
 let resonance = new ResonanceAudio(audioContext);
+
+// Connect the scene’s binaural output to stereo out.
 resonance.output.connect(audioContext.destination);
 
-audioContext.suspend();
+// Define room dimensions.
+// By default, room dimensions are undefined (0m x 0m x 0m).
+let roomDimensions = {
+	width: 3.1,
+	height: 2.5,
+	depth: 3.4,
+};
+
+// Add the room definition to the scene.
+resonanceAudioScene.setRoomProperties(roomDimensions);
+
+// Create an AudioElement.
+let audioElement = document.createElement("audio");
+
+// Load an audio file into the AudioElement.
+audioElement.src = "irritating_noise.wav";
+
+// Generate a MediaElementSource from the AudioElement.
+let audioElementSource = audioContext.createMediaElementSource(audioElement);
+
+// Add the MediaElementSource to the scene as an audio input source.
+let source = resonanceAudioScene.createSource();
+audioElementSource.connect(source.input);
+
+// Set the source position relative to the room center (source default position).
+source.setPosition(-1.0, -1.0, 0.0);
 
 function onResize() { // this function resizes our canvas in a way, that makes it fit the entire screen perfectly!
 	canvas.width = canvas.clientWidth * window.devicePixelRatio;
@@ -155,6 +182,9 @@ function onSessionStarted(_session) { // this function defines what happens when
 	});
 
 	function onSessionFrame(t, frame) { // this function will happen every frame
+		// Play the audio.
+		audioElement.play();
+
 		const session = frame.session; // frame is a frame handling object - it's used to get frame sessions, frame WebGL layers and some more things
 		session.requestAnimationFrame(onSessionFrame); // we simply set our animation frame function to be this function again
 		let pose = frame.getViewerPose(xrRefSpace); // gets the pose of the headset, relative to the previously gotten referance space

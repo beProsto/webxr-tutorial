@@ -13,14 +13,65 @@ So to start off, let's import `resonance audio` into our project, that will requ
 <script src="https://cdn.jsdelivr.net/npm/resonance-audio/build/resonance-audio.min.js"></script>
 ```
 
-before any other `script` tag. Now we have succesfully included resonance into our project. So... How do we use it? Well - that's another thing. WebXR samples themselves have a function used to create audio sources, so we'll also do that, but first we'll have to setup some globals for our audio (in `index.js` of course):
+before any other `script` tag. Now we have succesfully included resonance into our project. So... How do we use it? Well - that's another thing. First we'll have to setup some globals for our audio (in `index.js` of course):
 ```js
 // resonance globals
 let audioContext = new AudioContext();
 let resonance = new ResonanceAudio(audioContext);
+
+// Connect the scene’s binaural output to stereo out.
 resonance.output.connect(audioContext.destination);
 
-audioContext.suspend();
+// Define room dimensions.
+// By default, room dimensions are undefined (0m x 0m x 0m).
+let roomDimensions = {
+	width: 5,
+	height: 5,
+	depth: 5,
+};
+
+// Define materials for each of the room’s six surfaces.
+// Room materials have different acoustic reflectivity.
+let roomMaterials = {
+	// Room wall materials
+	left: "brick-bare",
+	right: "curtain-heavy",
+	front: "marble",
+	back: "glass-thin",
+	// Room floor
+	down: "grass",
+	// Room ceiling
+	up: "transparent",
+};
+
+// Add the room definition to the scene.
+resonanceAudioScene.setRoomProperties(roomDimensions, roomMaterials);
+```
+
+Now let's create a sound. For now there will be only one looped sound playing in our scene.
+```js
+// Create an AudioElement.
+let audioElement = document.createElement("audio");
+
+// Load an audio file into the AudioElement.
+audioElement.src = "irritating_noise.wav";
+
+// Generate a MediaElementSource from the AudioElement.
+let audioElementSource = audioContext.createMediaElementSource(audioElement);
+
+// Add the MediaElementSource to the scene as an audio input source.
+let source = resonanceAudioScene.createSource();
+audioElementSource.connect(source.input);
+
+// Set the source position relative to the room center (source default position).
+source.setPosition(-1.0, -1.0, 0.0);
+```
+
+After the scene is finally loaded we'd want to play our sound:
+```js
+function onSessionFrame(t, frame) { // this function will happen every frame
+	// Play the audio.
+	audioElement.play();
 ```
 
 You can check out the project's files [here](https://github.com/beProsto/webxr-tutorial/tree/master/projects/tutorial10)!
