@@ -10,6 +10,40 @@ function mulVecByMat(out, m, v) {
 	out[3] = m[12] * v[0] + m[13] * v[1] + m[14] * v[2] + m[15] * v[3];
 }
 
+
+// resonance globals
+let audioContext = new AudioContext();
+let resonance = new ResonanceAudio(audioContext);
+
+// Connect the scene’s binaural output (headphones for instance) to stereo out.
+resonance.output.connect(audioContext.destination);
+
+// Add the room definition to the scene. We are passing in two objects, both of which i will leave empty for now, so they set to default values.
+// The first object defines the room's width, height and length 
+// while the second one defines the materials it's walls are made up of.
+// For more information you can visit the Resonance Audio's website. :D
+resonanceAudioScene.setRoomProperties({}, {});
+
+// Create an HTML AudioElement. It will store the audio source's path.
+let audioElement = document.createElement("audio");
+
+// Load an audio file into the AudioElement.
+audioElement.src = "irritating_noise.wav"; // You can use any sound you would like to.
+
+// Generate a MediaElementSource from the AudioElement. It will store the audio's source. 
+let audioElementSource = audioContext.createMediaElementSource(audioElement);
+
+// The audio input source doesn't really store the audio's source. It's actually responsible for positioning the audio in the scene and passing it correctly to the audio output (playing it).
+let source = resonanceAudioScene.createSource();
+// We connect it to the MediaElementSource object, so that it knows what audio it actually operates on.
+audioElementSource.connect(source.input);
+
+// Set the source position relative to the room center (source default position).
+source.setPosition(0.0, 0.0, 0.0);
+
+// Play the audio when the "Play sound" button is pressed.
+document.getElementById("sound-button").addEventListener("click", (e) => {audioElement.play();});
+
 let canvas = null; // we'll keep it as a global object
 
 // XR globals.
@@ -50,40 +84,6 @@ function onControllerUpdate(session, frame) { // this function will be called ev
 		}
 	}
 }
-
-// resonance globals
-let audioContext = new AudioContext();
-let resonance = new ResonanceAudio(audioContext);
-
-// Connect the scene’s binaural output to stereo out.
-resonance.output.connect(audioContext.destination);
-
-// Define room dimensions.
-// By default, room dimensions are undefined (0m x 0m x 0m).
-let roomDimensions = {
-	width: 3.1,
-	height: 2.5,
-	depth: 3.4,
-};
-
-// Add the room definition to the scene.
-resonanceAudioScene.setRoomProperties(roomDimensions);
-
-// Create an AudioElement.
-let audioElement = document.createElement("audio");
-
-// Load an audio file into the AudioElement.
-audioElement.src = "irritating_noise.wav";
-
-// Generate a MediaElementSource from the AudioElement.
-let audioElementSource = audioContext.createMediaElementSource(audioElement);
-
-// Add the MediaElementSource to the scene as an audio input source.
-let source = resonanceAudioScene.createSource();
-audioElementSource.connect(source.input);
-
-// Set the source position relative to the room center (source default position).
-source.setPosition(-1.0, -1.0, 0.0);
 
 function onResize() { // this function resizes our canvas in a way, that makes it fit the entire screen perfectly!
 	canvas.width = canvas.clientWidth * window.devicePixelRatio;
@@ -182,9 +182,6 @@ function onSessionStarted(_session) { // this function defines what happens when
 	});
 
 	function onSessionFrame(t, frame) { // this function will happen every frame
-		// Play the audio.
-		audioElement.play();
-
 		const session = frame.session; // frame is a frame handling object - it's used to get frame sessions, frame WebGL layers and some more things
 		session.requestAnimationFrame(onSessionFrame); // we simply set our animation frame function to be this function again
 		let pose = frame.getViewerPose(xrRefSpace); // gets the pose of the headset, relative to the previously gotten referance space

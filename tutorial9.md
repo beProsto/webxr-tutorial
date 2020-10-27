@@ -199,8 +199,8 @@ In the next episode we're going to go about doing 3D audio!
 
 You can check out the project's files [here](https://github.com/beProsto/webxr-tutorial/tree/master/projects/tutorial9)!
 
-Previous: [Reading the controllers' input](tutorial8)
 Next: [3D Sounds](tutorial10)
+Previous: [Reading the controllers' input](tutorial8)
 
 <div GITHUB_API_ID="9"></div>
 

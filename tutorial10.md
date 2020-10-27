@@ -12,67 +12,82 @@ So to start off, let's import `resonance audio` into our project, that will requ
 ```html
 <script src="https://cdn.jsdelivr.net/npm/resonance-audio/build/resonance-audio.min.js"></script>
 ```
+before any other `script` tag. Now we have succesfully included resonance into our project. So... How do we use it? Well - that's another thing. 
 
-before any other `script` tag. Now we have succesfully included resonance into our project. So... How do we use it? Well - that's another thing. First we'll have to setup some globals for our audio (in `index.js` of course):
+First let's make something that will empower us with the possibility to play sounds. A button will do just fine for now. Of course, later on in this tutorial we are going to add the sounds to the VR part of this application, but for now let's focus on testing if they actually work. 
+
+What's nice about this approach is that we will not have to start up our headsets or phones yet. We will just simply test it out on our PC's, and then go on to implement it into VR.
+
+So let's start off by creating a simple "`Play Sound`" button.
+We will, of course, do it in the HTML part of our website.
+
+That goes right after the creation of the first button:
+```html
+<button id="sound-button">Play sound</button>
+```
+
+We can add some style to it in the `<style>` section of course:
+```css
+#sound-button {
+	background-color: rgba(251, 212, 255, 0.603);
+	border: rgb(212, 133, 218) 2px solid;
+	color: rgb(0, 0, 0);
+	height: 50px;
+	min-width: 160px;
+}
+```
+
+This is how our website should look after these modifications:
+
+![screenshot](data/tutorial10/tutorial10_screenshot1.png)
+
+Now let's code it's functionality of playing a sound effect.
+
+This is the easiest way we can achieve playing a sound:
 ```js
 // resonance globals
 let audioContext = new AudioContext();
 let resonance = new ResonanceAudio(audioContext);
 
-// Connect the scene’s binaural output to stereo out.
+// Connect the scene’s binaural output (headphones for instance) to stereo out.
 resonance.output.connect(audioContext.destination);
 
-// Define room dimensions.
-// By default, room dimensions are undefined (0m x 0m x 0m).
-let roomDimensions = {
-	width: 5,
-	height: 5,
-	depth: 5,
-};
+// Add the room definition to the scene. We are passing in two objects, both of which i will leave empty for now, so they set to default values.
+// The first object defines the room's width, height and length 
+// while the second one defines the materials it's walls are made up of.
+// For more information you can visit the Resonance Audio's website. :D
+resonanceAudioScene.setRoomProperties({}, {});
 
-// Define materials for each of the room’s six surfaces.
-// Room materials have different acoustic reflectivity.
-let roomMaterials = {
-	// Room wall materials
-	left: "brick-bare",
-	right: "curtain-heavy",
-	front: "marble",
-	back: "glass-thin",
-	// Room floor
-	down: "grass",
-	// Room ceiling
-	up: "transparent",
-};
-
-// Add the room definition to the scene.
-resonanceAudioScene.setRoomProperties(roomDimensions, roomMaterials);
-```
-
-Now let's create a sound. For now there will be only one looped sound playing in our scene.
-```js
-// Create an AudioElement.
+// Create an HTML AudioElement. It will store the audio source's path.
 let audioElement = document.createElement("audio");
 
 // Load an audio file into the AudioElement.
-audioElement.src = "irritating_noise.wav";
+audioElement.src = "irritating_noise.wav"; // You can use any sound you would like to.
 
-// Generate a MediaElementSource from the AudioElement.
+// Generate a MediaElementSource from the AudioElement. It will store the audio's source. 
 let audioElementSource = audioContext.createMediaElementSource(audioElement);
 
-// Add the MediaElementSource to the scene as an audio input source.
+// The audio input source doesn't really store the audio's source. It's actually responsible for positioning the audio in the scene and passing it correctly to the audio output (playing it).
 let source = resonanceAudioScene.createSource();
+// We connect it to the MediaElementSource object, so that it knows what audio it actually operates on.
 audioElementSource.connect(source.input);
 
 // Set the source position relative to the room center (source default position).
-source.setPosition(-1.0, -1.0, 0.0);
+source.setPosition(0.0, 0.0, 0.0);
+
+// Play the audio when the "Play sound" button is pressed.
+document.getElementById("sound-button").addEventListener("click", (e) => {audioElement.play();});
 ```
 
-After the scene is finally loaded we'd want to play our sound:
-```js
-function onSessionFrame(t, frame) { // this function will happen every frame
-	// Play the audio.
-	audioElement.play();
-```
+Great! Now we can hear a sound once we press a button. But we have a couple things to do before we call it finished:
+
+- How do we loop the audio?
+- How do we stop it?
+- Can we manually set the timestamp that the audio should start from?
+- How do we make the audio 3D and dependant on our head's motion?
+- How to actually play it in VR mode?
+
+Well, Let me answer all of these questions for you.
 
 You can check out the project's files [here](https://github.com/beProsto/webxr-tutorial/tree/master/projects/tutorial10)!
 
