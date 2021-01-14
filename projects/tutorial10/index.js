@@ -22,7 +22,7 @@ resonance.output.connect(audioContext.destination);
 // The first object defines the room's width, height and length 
 // while the second one defines the materials it's walls are made up of.
 // For more information you can visit the Resonance Audio's website. :D
-resonanceAudioScene.setRoomProperties({}, {});
+resonance.setRoomProperties({}, {});
 
 // Create an HTML AudioElement. It will store the audio source's path.
 let audioElement = document.createElement("audio");
@@ -34,7 +34,7 @@ audioElement.src = "irritating_noise.wav"; // You can use any sound you would li
 let audioElementSource = audioContext.createMediaElementSource(audioElement);
 
 // The audio input source doesn't really store the audio's source. It's actually responsible for positioning the audio in the scene and passing it correctly to the audio output (playing it).
-let source = resonanceAudioScene.createSource();
+let source = resonance.createSource();
 // We connect it to the MediaElementSource object, so that it knows what audio it actually operates on.
 audioElementSource.connect(source.input);
 
