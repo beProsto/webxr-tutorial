@@ -98,7 +98,7 @@ Essentially; we need to use the `loop` argument when creating the audio:
 <audio src="irritating_noise.wav" loop/>
 ```
 
-Great! Now the only problem is that we **can't** do it this way! Why? Because we created it in `JavaScript`, meaning we can't just go ahead an type `loop` in just like that. If it was a boolean, we could technically do
+Great! Now the only problem is that we **can't** do it this way! Why? Because we created it in `JavaScript`, meaning we can't just go ahead and type `loop` in just like that. If it was a boolean, we could technically do
 ```js
 audioElement.loop = true;
 ```
