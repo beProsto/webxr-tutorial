@@ -10,6 +10,8 @@ function mulVecByMat(out, m, v) {
 	out[3] = m[12] * v[0] + m[13] * v[1] + m[14] * v[2] + m[15] * v[3];
 }
 
+// global sound playing state
+let isSoundPlaying = false;
 
 // resonance globals
 let audioContext = new AudioContext();
@@ -30,9 +32,12 @@ let audioElement = document.createElement("audio");
 // Load an audio file into the AudioElement.
 audioElement.src = "irritating_noise.wav"; // You can use any sound you would like to.
 
+// Loop the audio
+audioElement.loop = true;
+
 // Generate a MediaElementSource from the AudioElement. It will store the audio's source. 
 let audioElementSource = audioContext.createMediaElementSource(audioElement);
-
+ 
 // The audio input source doesn't really store the audio's source. It's actually responsible for positioning the audio in the scene and passing it correctly to the audio output (playing it).
 let source = resonance.createSource();
 // We connect it to the MediaElementSource object, so that it knows what audio it actually operates on.
@@ -41,8 +46,28 @@ audioElementSource.connect(source.input);
 // Set the source position relative to the room center (source default position).
 source.setPosition(0.0, 0.0, 0.0);
 
-// Play the audio when the "Play sound" button is pressed.
-document.getElementById("sound-button").addEventListener("click", (e) => {audioElement.play();});
+// Toggle the audio when the "Play sound" button is pressed.
+document.getElementById("sound-button").addEventListener("click", (e) => {
+	// if the sound isn't playing
+	if(!isSoundPlaying) {
+		// get the wanted time
+		const time = parseInt(document.getElementById("sound-time").value);
+		// set it's time
+		audioElement.currentTime = time;
+		// start playing it
+		audioElement.play();
+		// make sure to keep in mind that it's playing
+		isSoundPlaying = true;
+	}
+	// but if it already is playing
+	else {
+		// make it stop;
+		// 1. pause it
+		audioElement.pause();
+		// and keep in mind that it's not playing anymore
+		isSoundPlaying = false;
+	}
+});
 
 let canvas = null; // we'll keep it as a global object
 

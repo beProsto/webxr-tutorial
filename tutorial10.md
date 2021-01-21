@@ -89,12 +89,134 @@ Great! Now we can hear a sound once we press a button. But we have a couple thin
 
 Well, Let me answer all of these questions for you.
 
-First, looping the audio. This one is actually pretty hard to find info on.
+## First, looping the audio. 
+This one is actually pretty hard to find info on.
+The thing is that we don't really do it using the resonance audio library itself, as you might've realised we use an HTML audio element here. It is used as a sample holder, but also any changes we make to it, will of course be further on included in the final audio after the positional additions made by the resonance library. 
+
+Essentially; we need to use the `loop` argument when creating the audio:
+```html
+<audio src="irritating_noise.wav" loop/>
+```
+
+Great! Now the only problem is that we **can't** do it this way! Why? Because we created it in `JavaScript`, meaning we can't just go ahead an type `loop` in just like that. If it was a boolean, we could technically do
+```js
+audioElement.loop = true;
+```
+
+and if we test this out, we find that it, in fact, does actually work.
+
+I don't even know what to say. I was preparing the script for what seemed like an inevitable disaster, but it seems like this value is, in fact, a boolean.
+Colour me suprised, as I didn't know this. The more you know as they say, anyways so that was how you loop the audio. You just make the `loop` boolean true for the `audioElement`. You can do do it right after it's creation;
+```js
+// Create an HTML AudioElement. It will store the audio source's path.
+let audioElement = document.createElement("audio");
+
+// Load an audio file into the AudioElement.
+audioElement.src = "irritating_noise.wav"; // You can use any sound you would like to.
+
+// Loop the audio
+audioElement.loop = true;
+```
+
+Or do it anywhaere else, as long as you do it before actually playing the audio, you should be fine. :D
+
+## Second, how do we stop the looped audio from playing?
+First let's figure out why we'd like to do that, and it's a geniuine question of course, because most of the times that we play some song, we want it to finish at it's end, right? Well, let's take, for example a simple in-game shooting mechanic. We have a looped audio of our machine gun shooting, so that it can start playing when we start shooting, and reapeat itself over and over agian, because we don't want to have a giant file with repeating sounds. But what happens when we stop shooting? Well in this case, without the knowledge on how to stop the audio from playing, it will play forever, even long after we stopped shooting, or even are out of rounds. So, how *do* we stop the audio from playing? Well, this is a simple question to answer; we use the `pause` function! Yep. As simple as that. Of course, we don't just want to pause it, we want to stop it, meaning that we want to pause and reset it, and that's exactly what we're going to do.
+
+So the plan is:
+
+From now on the button that up until this point was just designed to play the audio, is actually going to toggle the audio. Meaning that it will make it play when it's stopped, and it will make it stop when it's playing. Basic stuff. Let's start by creating a boolean value that will take care of holding the information on whether or not the audio is playing.
+```js
+// global sound playing state
+let isSoundPlaying = false;
+```
+
+Now, let's go and modify the button press event code. 
+```js
+// Toggle the audio when the "Play sound" button is pressed.
+document.getElementById("sound-button").addEventListener("click", (e) => {
+	// if the sound isn't playing
+	if(!isSoundPlaying) {
+		// start playing it
+		audioElement.play();
+		// make sure to keep in mind that it's playing
+		isSoundPlaying = true;
+	}
+	// but if it already is playing
+	else {
+		// make it stop;
+		// 1. pause it
+		audioElement.pause();
+		// 2. reset it's time
+		audioElement.currentTime = 0;
+		// and keep in mind that it's not playing anymore
+		isSoundPlaying = false;
+	}
+});
+```
+
+If we test out our website now, we should be able to play the sound and then reset it, just as we see fit.
+I'm just happy that I don't have to listen to it on loop anymore. :D
+
+## Third of all, can we manually set the timestamp the audio should start from?
+Short answer: yes we can. The longer answer includes an explonation on how to do that.
+
+So the thing is; you already know how, we did it when we were stopping the audio. We set the current time to zero by then. But is it a zero in seconds? Is it a percentage?
+That's what we need to find out now. So let's make a quick textbox that will only take in numerical values, and let's make it change from what time the audio starts.
+```html
+		<header id="main">
+			<h2 id="header">WebXR VR Test</h2>
+			<button id="xr-button" disabled>VR not found</button>
+			<button id="sound-button">Play sound</button>
+			<br><br>
+			<input id="sound-time" type="number">
+		</header>
+```
+So that number input has got some flaws, but it will at least be simply easy to get the value out of.
+
+Here's how it should look:
+
+![screenshot](data/tutorial10/tutorial10_screenshot2.png)
+
+Now, there are very little, in fact close to no modifications we have to do to our code, we just need to change the audio playing function a bit again:
+```js
+// Toggle the audio when the "Play sound" button is pressed.
+document.getElementById("sound-button").addEventListener("click", (e) => {
+	// if the sound isn't playing
+	if(!isSoundPlaying) {
+		// get the wanted time
+		const time = parseInt(document.getElementById("sound-time").value);
+		// set it's time
+		audioElement.currentTime = time;
+		// start playing it
+		audioElement.play();
+		// make sure to keep in mind that it's playing
+		isSoundPlaying = true;
+	}
+	// but if it already is playing
+	else {
+		// make it stop;
+		// 1. pause it
+		audioElement.pause();
+		// and keep in mind that it's not playing anymore
+		isSoundPlaying = false;
+	}
+});
+```
+
+So now let's try it out, shall we?
+Here's my theory: The audio we're about to play is five seconds long, which means that if we set the starting time value to one, it will either start from the start (which means we're working with "percentages" here, and we've just set the song to it's full length and it has reset back to the start), or it will start from the `0:01` time. And it comes out that the second theory is right, so that means we're measuring in seconds. Good, now we can play around with the time we want to start from.
+
+Anyways,
+
+## Fourth of all, the audio positioning based on the head's position and rotation.
+So there are essentially two ways of going around it:
+We either take our head's view matrix, inverse it and multiply every points position by that resulting matrix or we use some kind of a function built-in to this library which will, essentially, do it for us. :D
+
 
 You can check out the project's files [here](https://github.com/beProsto/webxr-tutorial/tree/master/projects/tutorial10)!
 
 Previous: [Experimenting with lighting](tutorial9)
-
 
 <div GITHUB_API_ID="10"></div>
 
