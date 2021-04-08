@@ -213,6 +213,9 @@ Anyways,
 So there are essentially two ways of going around it:
 We either take our head's view matrix, inverse it and multiply every points position by that resulting matrix or we use some kind of a function built-in to this library which will, essentially, do it for us. :D
 
+But first we need to address a certain other issue. If you followed this tutorial along whilst reading it you might've noticed that the audio doesn't work on any other browser than microsoft edge, if you don't go into settings and change up a couple things.
+
+
 
 You can check out the project's files [here](https://github.com/beProsto/webxr-tutorial/tree/master/projects/tutorial10)!
 

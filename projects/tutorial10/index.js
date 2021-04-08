@@ -55,7 +55,7 @@ document.getElementById("sound-button").addEventListener("click", (e) => {
 		// set it's time
 		audioElement.currentTime = time;
 		// start playing it
-		audioElement.play();
+		source.bufferSource.start(0);
 		// make sure to keep in mind that it's playing
 		isSoundPlaying = true;
 	}
@@ -63,7 +63,7 @@ document.getElementById("sound-button").addEventListener("click", (e) => {
 	else {
 		// make it stop;
 		// 1. pause it
-		audioElement.pause();
+		
 		// and keep in mind that it's not playing anymore
 		isSoundPlaying = false;
 	}
