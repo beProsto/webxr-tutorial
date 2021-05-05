@@ -1,5 +1,9 @@
 # 3D Sounds
 
+# THIS ARTICLE IS NOT YET FINISHED
+
+#### I was trying to make it work for the past year, fixed a copuple issues but I still have a couple problems with it that I would just like to fix before giving this tutorial to you. I don't want to ship a rushed, broken in places piece of [...]. I want my tutorials to fix problems, not create them, and this is what giving you the current solution would do. There's some type of a memory leak caused by using the web audio api, I need to look into it. The point is: I can't really finish the tutorial now, the thing you can read below was broken from the start, don't worry, we will not be using it, I need some time off to focus on a little bit more important things going on in my personal life. This goes on for hold, I am sorry to, well, myself, that the current situation brought me here. To the point at which I stopped pursuing my passions for more than an entire year... I'm also afraid that during that time my grades are not the only thing that decreased, but my ability and knowledge about writing code has also. I'm afraid that pauses like these could make me slower, maybe, likely actually, make me forget stuff... I'm dissapointed at myself. When will this end? Why am I making some sort of a thought bag out of this? If only I could write essays like this.. Can this pandemic just end? I know it's not the only reason why I have a hard time doing anything, but 
+
 ## This article will be dedicated for 3D sounds in VR space.
 
 In the last article we've been going over 3D lighting, in this one we're going to do something pleasing less for the eye, and more for the ear.
@@ -215,6 +219,7 @@ We either take our head's view matrix, inverse it and multiply every points posi
 
 But first we need to address a certain other issue. If you followed this tutorial along whilst reading it you might've noticed that the audio doesn't work on any other browser than microsoft edge, if you don't go into settings and change up a couple things.
 
+# THIS ARTICLE IS NOT YET FINISHED
 
 
 You can check out the project's files [here](https://github.com/beProsto/webxr-tutorial/tree/master/projects/tutorial10)!
