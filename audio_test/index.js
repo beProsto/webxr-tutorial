@@ -58,6 +58,10 @@ class PlayableAudio {
 		this.buffer = null;
 		this.bufferSource = null;
 
+		// These are useless callbacks but whatever
+		this.onFinished = () => {};
+		this.onStarted = () => {};
+
 		// We create a reference to the object itself
 		const self = this;
 
@@ -96,6 +100,8 @@ class PlayableAudio {
 			this.playable = true;
 			this.playing = false;
 
+			this.onFinished();
+
 			console.log(`Audio ${this.id} was in fact stopped!`);
 		};
 	}
@@ -110,6 +116,8 @@ class PlayableAudio {
 			console.log(`Audio ${this.id} has been indeed played!`);
 
 			this.playing = true;
+
+			this.onStarted();
 		}
 	}
 
@@ -153,7 +161,7 @@ class PlayableAudio {
 }
 
 // Make audios
-let audio1 = new PlayableAudio("/Nihilore - Panthalassa.mp3", [2.0, 0.0, 2.0]);
+let audio1 = new PlayableAudio("/amogus.mp3", [2.0, 0.0, 2.0]);
 
 // Play the audio.
 const playTime = document.getElementById("time");
@@ -169,6 +177,9 @@ playButton.onclick = (e) => {
 		audio1.stop();
 	}
 };
+
+// When audio finishes we want to automatically reset to a play button
+audio1.onFinished = () => { playButton.innerHTML = "play"; };
 
 // Choose wether or not to loop the audio.
 const loopButton = document.getElementById("loopButtonFront");
