@@ -1,3 +1,4 @@
+
 // Create an AudioContext
 let audioContext = new AudioContext();
 
@@ -7,25 +8,12 @@ let resonanceAudioScene = new ResonanceAudio(audioContext);
 
 // Connect the scene’s binaural output to stereo out.
 resonanceAudioScene.output.connect(audioContext.destination);
-audioContext.suspend();
 
-// Add the room definition to the scene.
-resonanceAudioScene.setRoomProperties({
-	// first, the room's dimensions
-	width: 3.1,
-	height: 2.5,
-	depth: 3.4,
-}, {
-	// Room wall materials
-	left: 'brick-bare',
-	right: 'curtain-heavy',
-	front: 'marble',
-	back: 'glass-thin',
-	// Room floor
-	down: 'grass',
-	// Room ceiling
-	up: 'transparent',
-});
+// Add the room definition to the scene. We are passing in two objects, both of which i will leave empty for now, so they set to default values.
+// The first object defines the room's width, height and length 
+// while the second one defines the materials it's walls are made up of.
+// For more information you can visit the Resonance Audio's website. :D
+resonanceAudioScene.setRoomProperties({}, {});
 
 // Let's keep track of the number of audios in the scene for absolutely no reason
 let audios = 0;
@@ -111,7 +99,6 @@ class PlayableAudio {
 		console.log(`Audio ${this.id} attempted to be played!`);
 		
 		if(this.playable && !this.playing) {
-			this.bufferSource.currentTime = _from;
 			this.bufferSource.start(0, _from);
 			console.log(`Audio ${this.id} has been indeed played!`);
 
