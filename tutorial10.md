@@ -548,7 +548,6 @@ If you've followed through this botched tutorial, and actually managed to learn 
 I'm sincerely sorry for the problems with this tutorial, I'll be working on a video tutorial series that I hope will make things clearer. :D
 
 Thank you very much for following along this journey, I love you all, have a great day!
-
 ### See ya! :D
 
 
