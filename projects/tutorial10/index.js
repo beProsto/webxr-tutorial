@@ -170,7 +170,7 @@ class PlayableAudio {
 }
 
 // Make the audio
-let audio1 = new PlayableAudio("/irritating_noise.wav", [0.0, 0.0, 0.0]);
+let audio1 = new PlayableAudio("/irritating_noise.wav", [0.0, 0.0, 0.0], true);
 
 // Play the audio. (shall the user so wish)
 const playTime = document.getElementById("sound-time");
@@ -178,7 +178,7 @@ const playButton = document.getElementById("sound-button");
 // A simple toggle between the states of wanting to stop and play the audio
 playButton.onclick = (e) => {
 	// We have to do it inside an event! No worries tho, we'll have it inside the "Enter VR" button's onclick function
-	audioContext.resume(); 
+	audioContext.resume();
 
 	// A simple toggle
 	if(playButton.innerHTML == "Play sound") {
@@ -272,6 +272,8 @@ function initWebXR() { // our new init function
 }
 
 function onButtonClicked() { // this function specifies what our button will do when clicked
+	audioContext.resume(); // we make the possibility for sounds to be played
+	
 	if(!xrSession) { // if our session is null - if it wasn't created
 		navigator.xr.requestSession("immersive-vr", {requiredFeatures: ["local-floor"]}).then(onSessionStarted); // request it (start the session), and when the request is handled, call onSessionStarted
 	} else { // if our session was started already
@@ -344,6 +346,9 @@ function onSessionStarted(_session) { // this function defines what happens when
 
 		if(pose) { // if the pose was possible to get (if the headset responds)
 			let glLayer = session.renderState.baseLayer; // get the WebGL layer (it contains some important information we need)
+			
+			// update the resonance audio scene, so that it knows where the player is and what orientation they're facing
+			resonanceAudioScene.setListenerFromMatrix({ elements: pose.transform.matrix });
 
 			onControllerUpdate(session, frame); // update the controllers' state
 
@@ -378,6 +383,25 @@ function onSessionStarted(_session) { // this function defines what happens when
 
 				// we offset our reference space
 				xrRefSpace = xrRefSpace.getOffsetReferenceSpace(new XRRigidTransform({x: xOffset, y: 0.0, z: zOffset})); 
+			}
+			// only if both the left and the right controller is detected
+			if(controllers.left && controllers.right) {
+				// if the X button is pressed on the right controller
+				if(controllers.right.gamepad.buttons[4].pressed) {
+					// we set the audio's position to be that controller's position
+					audio1.position = [
+						controllers.right.pose.transform.position.x,
+						controllers.right.pose.transform.position.y,
+						controllers.right.pose.transform.position.z
+					];
+					// we play the audio
+					audio1.play();
+				}
+				// if the X button on the left controller is pressed
+				if(controllers.left.gamepad.buttons[4].pressed) {
+					// we stop the audio
+					audio1.stop();
+				}
 			}
 
 			gl.bindFramebuffer(gl.FRAMEBUFFER, glLayer.framebuffer); // sets the framebuffer (drawing target of WebGL) to be our WebXR display's framebuffer

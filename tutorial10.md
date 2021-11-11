@@ -438,11 +438,118 @@ After all that, our website should work as expected (play the audio at a specifi
 ![screenshot](data/tutorial10/tutorial10_screenshot2.png)
 
 
-
 ## Audio positioning based on the head's position and rotation.
 So there are essentially two ways of going around it:
-We either take our head's view matrix, inverse it and multiply every points position by that resulting matrix or we use some kind of a function built-in to this library which will, essentially, do it for us. :D
+We either take our head's view matrix, inverse it and multiply every point's position by that resulting matrix or we use some kind of a function built-in to this library which will, essentially, do it for us. :D
 
+Of course, we're going with the second solution, simply because it's easier for both you and me.
+
+That function looks something like this:
+
+```js
+resonanceAudioScene.setListenerFromMatrix({ elements: pose.transform.matrix }); // the pose element is of course the frame.getViewerPose(refSpace)
+```
+
+As you see, it simply takes in our player's view (position and rotation) matrix.
+
+Soo, where should we put it?
+Well, first of all, let's make the sound a loop (so that we can play it and then go on to test it in VR). 
+
+```js
+// Make the audio
+let audio1 = new PlayableAudio("/irritating_noise.wav", [0.0, 0.0, 0.0], true);
+```
+
+That `true` at the end there will do the trick!
+Now, where to put the `setListenerFromMatrix` part?
+
+Well, we'll have to do it somewhere after we obtain the player's `pose`. :D
+
+I'd say this is an appropriate placement:
+
+```js
+		if(pose) { // if the pose was possible to get (if the headset responds)
+			let glLayer = session.renderState.baseLayer; // get the WebGL layer (it contains some important information we need)
+			
+			// update the resonance audio scene, so that it knows where the player is and what orientation they're facing
+			resonanceAudioScene.setListenerFromMatrix({ elements: pose.transform.matrix });
+
+			onControllerUpdate(session, frame); // update the controllers' state
+```
+
+Right between getting the webgl info and updating the controller's state! Seems to fit just right in. :D
+
+Sooo if we joined the game now, we should be able to move around the scene we've made in the previous episodes, except now with the addition of a sound that will constantly play in an ominous position out there somewhere (given that we started playing it *before* going into VR mode). 
+
+Now we'd want to be able to do would be to specify the audio's position in the scene, and play it inside. Thus we go onto:
+
+## Playing the audio in VR
+To be able to play the audio within VR we first need to resume the audioContext when pressing the "Enter VR" button:
+
+```js
+function onButtonClicked() { // this function specifies what our button will do when clicked
+	audioContext.resume(); // we make the possibility for sounds to be played
+```
+
+As you can see, our methodology is to simply add it to the `onButtonClicked` function. 
+
+Now that we've ensured that sounds can, indeed, be played - we have to, well, play the sound somewhere, somehow.
+
+Let's say I'd like to play it whenever one of the controller's buttons is pressed, from the given controller's position.
+
+So here's how we'd do it:
+
+```js
+			// only if both the left and the right controller is detected
+			if(controllers.left && controllers.right) {
+				// if the X button is pressed on the right controller
+				if(controllers.right.gamepad.buttons[4].pressed) {
+					// we set the audio's position to be that controller's position
+					audio1.position = [
+						controllers.right.pose.transform.position.x,
+						controllers.right.pose.transform.position.y,
+						controllers.right.pose.transform.position.z
+					];
+					// we play the audio
+					audio1.play();
+				}
+				// if the X button on the left controller is pressed
+				if(controllers.left.gamepad.buttons[4].pressed) {
+					// we stop the audio
+					audio1.stop();
+				}
+			}
+```
+
+We have to do that in the `onSenssionFrame` function, and when the `onControllerUpdate` function was already called.
+
+I just put it under the movement section;
+
+```js
+				// we slow it down a little bit, so that it will not make us nauseous once we move 
+				xOffset *= 0.1; 
+				zOffset *= 0.1;
+
+				// we offset our reference space
+				xrRefSpace = xrRefSpace.getOffsetReferenceSpace(new XRRigidTransform({x: xOffset, y: 0.0, z: zOffset})); 
+			}
+
+			// I PUT IT HERE
+```
+
+So now, you should be able to just get into the VR experience, click the X button on your right controller, and move around a playing audio situated in a specified by thou place, in 3D space!
+
+Amazing! That'd mean the tutorial is here on done for! I really wish you luck with using the newfound knowledge, and hopefully, putting it to a test!
+
+And also, I hope you learn a whole heck of a lot more on your journey here on out! :D
+
+If you've followed through this botched tutorial, and actually managed to learn anything, I'd love to personally grant you the order of "I don't even know how".
+
+I'm sincerely sorry for the problems with this tutorial, I'll be working on a video tutorial series that I hope will make things clearer. :D
+
+Thank you very much for following along this journey, I love you all, have a great day!
+
+### See ya! :D
 
 
 You can check out the project's files [here](https://github.com/beProsto/webxr-tutorial/tree/master/projects/tutorial10)!
