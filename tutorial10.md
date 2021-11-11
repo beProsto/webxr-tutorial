@@ -435,7 +435,7 @@ audio1.onFinished = () => { playButton.innerHTML = "Play sound"; };
 
 After all that, our website should work as expected (play the audio at a specified time, and stop it shall we please so), and look something like this:
 
-![screenshot](tutorial10_screenshot2.png)
+![screenshot](data/tutorial10/tutorial10_screenshot2.png)
 
 
 
