@@ -136,16 +136,310 @@ The names themselves will explain better:
 ```
 
 Now that we have all this, basically, setup, out of the way - we can start actually doing stuff somewhat related to sound!
-Here
 
-If we test out our website now, we should be able to play the sound and then reset it, just as we see fit.
-I'm just happy that I don't have to listen to it on loop anymore. :D
+Here we'll create a resonance audio source - an object which will let our resonance scene influence our audio.
 
-## Third of all, can we manually set the timestamp the audio should start from?
+For now we just need to let it know the position we desire for said sound.
+
 ```js
+		// Create a Resonance source and set its position in space.
+		this.source = resonanceAudioScene.createSource();
+		this.source.setPosition(this.posX, this.posY, this.posZ);
 ```
 
-## Fourth of all, the audio positioning based on the head's position and rotation.
+We'll also need two other objects - `buffer` and `bufferSource`.
+Buffer will contain the audio data itself. 
+The bufferSource however will be responsible for playing and stopping the audio.
+We'll need to reload (regenerate, recreate, whatever you want to call it) the bufferSource every time it ends - because once it stops, it won't be able to start again.
+If you want to know why - you can read about it [here :D](https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode).
+
+```js
+		// These will be filled when the sound is loaded
+		this.buffer = null;
+		this.bufferSource = null;
+```
+
+As the last thing to do in the constructor, we'll load the sound up from the url.
+We need to:
+1. Download it (`fetch` it)
+2. Decode audio data from it
+3. Use the decoded data in the `buffer` object
+4. Generate (create) and audio buffer source from that buffer
+
+```js
+		// Now we use the previously saved URL to download, "fetch", the audio from the server
+		fetch(this.url).then( // first we retrieve the data hiding behind the url, most likely it'll just be the audio file
+			(response) => response.arrayBuffer() // after retrieving the file, we treat it as a buffer or data, at this point it doesn't really matter what data it is
+		).then(
+			(buffer) => audioContext.decodeAudioData(buffer) // then we get the data we retrieved and finally try and find sound in it
+		).then( // if we found sound, as in - if the file contains audio data
+			(decodedBuffer) => {
+				this.buffer = decodedBuffer;
+				this.genBufferSource(); // we create the actual buffer that will be played
+			}
+		);
+```
+
+Now that the last part of the constructor is done, we can finally end it:
+
+```js
+	}
+```
+
+So, um, earlier we used a function named `genBufferSource`, we'll need to create it now.
+It's job will be to create a bufferSource that will use the data supplied by `buffer`.
+We'll also have to define what happens when the audio is stopped (either by a user or automatically after it ends (if it's not a loop)).
+
+First, let's create the bufferSource object:
+
+```js
+	// Generates the buffer that'll actually be played
+	genBufferSource() {
+		// Create a buffer source. This will need to be recreated every time
+		// we wish to start the audio, see
+		// https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode
+		this.bufferSource = audioContext.createBufferSource();
+		this.bufferSource.loop = this.isLoop; // tell it wether we want to loop it or not
+		this.bufferSource.connect(this.source.input); // we connect the audio, this will have to be reversed as soon as the audio ends
+
+		this.bufferSource.buffer = this.buffer;
+```
+
+Now we'll define what happens when it's stopped - it has a built-in callback for that.
+You see, we want to disconnect the bufferSource from the resonance audio scene's source.
+We'll also want to delete and regenerate it - as we know already, it'll only play once, after that, so, after it stops, we need to, again, regenerate it:
+
+```js
+		// Upon generating the buffer source, we define it's destructor - what happens, when it stops
+		// Audio can be ended both by a user (the stop function), and by itself - just reaching the end
+		this.bufferSource.onended = () => {
+			this.bufferSource.disconnect(); // we disconnect the audio, to get rid of some nasty handlers
+			delete this.bufferSource;
+
+			this.genBufferSource(); // we regenerate the buffer source - as we know, it has to be done every time the buffer ends, thus we do it here
+
+			// We set the state to be playable, not playing, so that we can start playing the audio whenever we use the "play" function
+			this.isPlayable = true;
+			this.isPlaying = false;
+
+			// We call the user-defined callback in case of a sound ending - these seem to be pretty handy, actually! :D
+			this.onFinished();
+
+			console.log(`Audio ${this.id} was in fact stopped!`);
+		};
+	}
+```
+
+And with that, we're on to the easier stuff;
+We'll want a function to play the audio at hand:
+(We only want to play it if it isn't playing already, and if it is playable)
+
+```js
+	// Play the audio (with the option of starting at a given time)
+	play(_from = 0) {
+		console.log(`Audio ${this.id} attempted to be played!`);
+		
+		// We should only be able to start playing the audio if it isn't playing already, and if it is playable (the cleanup process has finished)
+		if(this.isPlayable && !this.isPlaying) {
+			this.bufferSource.start(0, _from);
+
+			console.log(`Audio ${this.id} has been indeed played!`);
+
+			// We let the world know that the sound is, indeed, playing
+			this.isPlaying = true;
+
+			// We once again, call the user-defined callback, except this time it's for when the audio starts, which is indeed what happened :D
+			this.onStarted();
+		}
+	}
+```
+
+Now that we have the option to play the sound, we shall also be able to stop it, at any time we shall wish.
+To do that, we need the stop function:
+
+```js
+	// Stop the audio 
+	stop() {
+		console.log(`Audio ${this.id} attempted to be stopped!`);
+
+		// We only stop the audio if it is, in fact, playing AND isn't currently in the process of being stopped
+		if(this.isPlayable && this.isPlaying) {
+			this.isPlayable = false; // We mark that the audio is in the process of being stopped, thus can't be stopped nor played now
+
+			this.bufferSource.stop(0);
+
+			console.log(`Audio ${this.id} to be stopped!`);
+		}
+	}
+```
+
+We want to do some setters and getters now, first will come the setter and getter for the `loop` variable:
+
+```js
+	// These simply let us know and set if the audio is looped
+	set loop(_loop) {
+		this.isLoop = _loop;
+		this.bufferSource.loop = this.isLoop;
+	}
+	get loop() {
+		return this.isLoop;
+	}
+```
+
+Now we want a getter for how long the audio lasts:
+
+```js
+	// This one lets us check the duration of the audio (in seconds)
+	get duration() {
+		return this.buffer.duration;
+	}
+```
+
+Now, I think one of the most important ones, a getter and setter for the sound's position:
+
+```js
+	// Set and get audio's position
+	set position(_pos) {
+		this.posX = _pos[0];
+		this.posY = _pos[1];
+		this.posZ = _pos[2];
+
+		this.source.setPosition(this.posX, this.posY, this.posZ);
+	}
+	get position() {
+		return [this.posX, this.posY, this.posZ];
+	}
+```
+
+Aaaand we also want to be able to check if the sound is currently playing:
+
+```js
+	// Check if the audio is currently playing
+	get playing() {
+		return this.isPlayable && this.isPlaying;
+	}
+```
+
+Now we've pretty much finished our 3D audio class, and we can go on to close it:
+
+```js
+}
+```
+
+So, after all that, we can finally test if it all works! 
+
+Remember how earlier on, we've created another button that'll be displayed on the website?
+We want to be able to use it to play a sound!
+
+So let's create a simple test for our audio playing feature, using it!
+
+First let's make the audio:
+
+```js
+// Make the audio
+let audio1 = new PlayableAudio("/irritating_noise.wav", [0.0, 0.0, 0.0]);
+```
+
+You can check the `irritating_noise.wav` file out [here](https://github.com/beProsto/webxr-tutorial/blob/main/projects/tutorial10/irritating_noise.wav), if you don't have one to test!
+
+Great! We have created a sound! Now what?
+
+Well, now we use the button we defined earlier to play it!
+Like this:
+
+```js
+// We get the button via it's ID
+const playButton = document.getElementById("sound-button");
+
+// When it's clicked - we play the sound
+playButton.onclick = (e) => {
+	// This function allows our application to play sounds. We have to do it inside a user initiated event - that's why we're doing it here. No worries tho, we'll have it inside the "Enter VR" button's onclick function
+	audioContext.resume(); 
+
+	// We play the audio from the start, till the end.
+	audio1.play();
+};
+```
+
+Now, if we've done everything right, we should be able to just go and play the sound on our web application. 
+
+Remember - if you've had any problems with this tutorial up until this point, including here, you can always feel free to just ask in the comments!
+
+Anyhow, if it works - great! It works! We should now be in position to test out other functions, like stopping the sound on the fly:
+
+```js
+// Play the audio. (shall the user so wish)
+const playButton = document.getElementById("sound-button");
+// A simple toggle between the states of wanting to stop and play the audio
+playButton.onclick = (e) => {
+	// We have to do it inside an event! No worries tho, we'll have it inside the "Enter VR" button's onclick function
+	audioContext.resume(); 
+
+	// A simple toggle
+	if(playButton.innerHTML == "Play sound") {
+		playButton.innerHTML = "Stop sound";
+
+		// Play the audio
+		audio1.play();
+	}
+	else {
+		playButton.innerHTML = "Play sound";
+
+		// Stop the audio
+		audio1.stop();
+	}
+};
+
+// When audio finishes we want to automatically reset to a play button
+audio1.onFinished = () => { playButton.innerHTML = "Play sound"; };
+```
+
+Or, expanding on that even further, adding a number input to our site that'll let us decide the precise time from which we'll want the sound to begin:
+
+```html			
+			<br><br>
+			<input id="sound-time" type="number" step="0.1" value="0">
+```
+
+We add that right under where we added our play button. :p
+
+Now, let's use it to play the sound from a specific time:
+
+```js
+// Play the audio. (shall the user so wish)
+const playTime = document.getElementById("sound-time");
+const playButton = document.getElementById("sound-button");
+// A simple toggle between the states of wanting to stop and play the audio
+playButton.onclick = (e) => {
+	// We have to do it inside an event! No worries tho, we'll have it inside the "Enter VR" button's onclick function
+	audioContext.resume(); 
+
+	// A simple toggle
+	if(playButton.innerHTML == "Play sound") {
+		playButton.innerHTML = "Stop sound";
+
+		// Play the audio at a given time
+		audio1.play(parseFloat(playTime.value));
+	}
+	else {
+		playButton.innerHTML = "Play sound";
+
+		// Stop the audio
+		audio1.stop();
+	}
+};
+
+// When audio finishes we want to automatically reset to a play button
+audio1.onFinished = () => { playButton.innerHTML = "Play sound"; };
+```
+
+After all that, our website should work as expected (play the audio at a specified time, and stop it shall we please so), and look something like this:
+
+![screenshot](tutorial10_screenshot2.png)
+
+
+
+## Audio positioning based on the head's position and rotation.
 So there are essentially two ways of going around it:
 We either take our head's view matrix, inverse it and multiply every points position by that resulting matrix or we use some kind of a function built-in to this library which will, essentially, do it for us. :D
 

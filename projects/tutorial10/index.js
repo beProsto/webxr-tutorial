@@ -62,9 +62,6 @@ class PlayableAudio {
 		this.buffer = null;
 		this.bufferSource = null;
 
-		// We create a reference to the object itself
-		const self = this;
-
 		// Now we use the previously saved URL to download, "fetch", the audio from the server
 		fetch(this.url).then( // first we retrieve the data hiding behind the url, most likely it'll just be the audio file
 			(response) => response.arrayBuffer() // after retrieving the file, we treat it as a buffer or data, at this point it doesn't really matter what data it is
@@ -72,8 +69,8 @@ class PlayableAudio {
 			(buffer) => audioContext.decodeAudioData(buffer) // then we get the data we retrieved and finally try and find sound in it
 		).then( // if we found sound, as in - if the file contains audio data
 			(decodedBuffer) => {
-				self.buffer = decodedBuffer;
-				self.genBufferSource(); // we create the actual buffer that will be played
+				this.buffer = decodedBuffer;
+				this.genBufferSource(); // we create the actual buffer that will be played
 			}
 		);
 	}
