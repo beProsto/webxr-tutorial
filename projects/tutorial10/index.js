@@ -386,7 +386,7 @@ function onSessionStarted(_session) { // this function defines what happens when
 			}
 			// only if both the left and the right controller is detected
 			if(controllers.left && controllers.right) {
-				// if the X button is pressed on the right controller
+				// if the A button is pressed on the right controller
 				if(controllers.right.gamepad.buttons[4].pressed) {
 					// we set the audio's position to be that controller's position
 					audio1.position = [
@@ -407,7 +407,6 @@ function onSessionStarted(_session) { // this function defines what happens when
 			gl.bindFramebuffer(gl.FRAMEBUFFER, glLayer.framebuffer); // sets the framebuffer (drawing target of WebGL) to be our WebXR display's framebuffer
 			
 			renderer.clear([0.3, 1.0, 0.4, 1.0]);
-
 
 			for(let view of pose.views) { // we go through every single view out of our camera's views
 				let viewport = glLayer.getViewport(view); // we get the viewport of our view (the place on the screen where things will be drawn)
@@ -441,9 +440,9 @@ function onSessionStarted(_session) { // this function defines what happens when
 					controllerMaterial.setView(view.transform.inverse.matrix);
 					controllerMaterial.setModel(controllers.right.pose.transform.matrix); // we just get our model matrix for the controller
 					
-					const red = controllers.right.gamepad.buttons[0].value; // left controller's trigger's value
-					const green = controllers.right.gamepad.buttons[1].value; // left controller's grab's value
-					const blue = controllers.right.gamepad.buttons[4].value; // left controller's A button's value
+					const red = controllers.right.gamepad.buttons[0].value; // right controller's trigger's value
+					const green = controllers.right.gamepad.buttons[1].value; // right controller's grab's value
+					const blue = controllers.right.gamepad.buttons[4].value; // right controller's A button's value
 
 					controllerMaterial.setColor([red, green, blue, 1.0]); // color black
 
