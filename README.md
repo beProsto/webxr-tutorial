@@ -11,3 +11,6 @@ It also features a comment functionality!
 
 I hope you like it. :D
 
+You can check it out in it's github pages glory here:
+
+[beprosto.github.io/webxr-tutorial](https://beprosto.github.io/webxr-tutorial/) 
