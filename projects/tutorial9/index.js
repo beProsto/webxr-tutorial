@@ -115,7 +115,7 @@ function onSessionStarted(_session) { // this function defines what happens when
 	]);
 	
 	const planeMesh = new ezgfx.Mesh();
-	planeMesh.loadFromOBJ("/plane.obj");
+	planeMesh.loadFromOBJ("./plane.obj");
 
 	const planeMaterial = new ezgfx.Material(lightShader.vertex, null, lightShader.shader);
 	planeMaterial.setProjection(identityMatrix);
@@ -125,7 +125,7 @@ function onSessionStarted(_session) { // this function defines what happens when
 	planeMaterial.setColor([0.5, 0.5, 0.5, 1.0]);
 
 	const cubeMesh = new ezgfx.Mesh();
-	cubeMesh.loadFromOBJ("/cube.obj");
+	cubeMesh.loadFromOBJ("./cube.obj");
 
 	const cubeMaterial = new ezgfx.Material(lightShader.vertex, null, lightShader.shader);
 	cubeMaterial.setProjection(identityMatrix);
@@ -135,7 +135,7 @@ function onSessionStarted(_session) { // this function defines what happens when
 	cubeMaterial.setColor([0.4, 0.3, 1.0, 1.0]);
 
 	const controllerMesh = new ezgfx.Mesh();
-	controllerMesh.loadFromOBJ("/controller.obj");
+	controllerMesh.loadFromOBJ("./controller.obj");
 
 	const controllerMaterial = new ezgfx.Material(lightShader.vertex, null, lightShader.shader);
 	controllerMaterial.setProjection(identityMatrix);
