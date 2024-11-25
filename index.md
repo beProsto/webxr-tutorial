@@ -1,6 +1,6 @@
 # Welcome to my WebXR tutorial series!
-## Hello, I'm beProsto and in this series of articles I'm going to cover a couple of topics regarding VR application developement with WebXR. 
-## In this, first, main article we are going to cover what is WebXR, and why would you want to use it for VR developement instead of WebVR.
+Hello, I'm beProsto and in this series of articles I'm going to cover a couple of topics regarding VR application developement with WebXR. 
+In this, first, main article we are going to cover what is WebXR, and why would you want to use it for VR developement instead of WebVR.
 
 So, let's start, shall we?
 Why would you want to use WebXR instead of something like WebVR? Well, most likely because it's newer.
